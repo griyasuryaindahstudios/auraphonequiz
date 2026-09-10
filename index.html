@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Chosen Palette: Quizizz Cyber Purple & Neon Accent -->
-    <!-- Application Structure Plan: Single-page Quiz application featuring real-time multi-device synchronization via WiFi IP matching and WebSocket message broadcasting. Includes multi-provider IP detection, fallback MQTT brokers for firewall bypassing, interactive quiz player, anti-cheat detection, full admin suite, and global leaderboard. -->
+    <!-- Application Structure Plan: Single-page Quiz application featuring real-time multi-device synchronization via WiFi IP matching and WebSocket message broadcasting. Includes multi-provider IP detection, fallback MQTT brokers for firewall bypassing, interactive quiz player, anti-cheat detection, full admin suite, and global leaderboard. Responsive layout optimized for mobile viewports without display cropping issues. -->
     <!-- Visualization & Content Choices: Uses HTML/Tailwind dynamic components, Canvas Confetti for rewards, Web Audio API for interactive audio feedback, and MQTT WebSocket network integration. NO SVG graphics or Mermaid JS used. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
@@ -266,7 +266,7 @@
             </div>
 
             <!-- Question Card -->
-            <div id="question-card" class="card-element bg-gradient-to-b from-purple-900/90 to-quiz-darkPurple p-6 md:p-8 rounded-3xl border border-purple-700/50 shadow-2xl relative overflow-hidden min-h-[200px] flex flex-col justify-center items-center text-center">
+            <div id="question-card" class="card-element bg-gradient-to-b from-purple-900/90 to-quiz-darkPurple p-5 md:p-8 rounded-3xl border border-purple-700/50 shadow-2xl relative overflow-hidden min-h-[200px] flex flex-col justify-center items-center text-center">
                 <!-- Point value badge -->
                 <span id="question-points-badge" class="absolute top-4 right-4 bg-purple-800/80 border border-purple-600 text-purple-200 text-xs font-bold px-3 py-1 rounded-full">
                     +1000 Poin max
@@ -494,8 +494,8 @@
     </footer>
 
     <!-- MODAL: NETWORK / SYNC STATUS & SETTINGS -->
-    <div id="modal-network-sync" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-quiz-darkPurple border border-cyan-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl relative">
+    <div id="modal-network-sync" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+        <div class="bg-quiz-darkPurple border border-cyan-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
             <button onclick="app.closeSyncModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
@@ -558,8 +558,8 @@
     </div>
 
     <!-- MODAL: ADMIN PASSWORD PROMPT -->
-    <div id="modal-admin-auth" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl relative">
+    <div id="modal-admin-auth" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+        <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
             <button onclick="app.closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
@@ -594,16 +594,16 @@
     <!-- MODAL: EDIT / CREATE QUIZ -->
     <div id="modal-edit-quiz" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
         <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-2xl rounded-3xl p-6 md:p-8 shadow-2xl relative my-8 max-h-[90vh] flex flex-col">
-            <button onclick="app.closeEditQuizModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2">
+            <button onclick="app.closeEditQuizModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-20">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
 
-            <h3 class="font-fredoka text-2xl font-bold text-white mb-4 flex items-center space-x-2">
+            <h3 class="font-fredoka text-2xl font-bold text-white mb-4 flex items-center space-x-2 flex-shrink-0">
                 <i class="fa-solid fa-pen-to-square text-pink-400"></i>
                 <span>Editor Kuis & Soal</span>
             </h3>
 
-            <div class="space-y-4 overflow-y-auto pr-2 flex-1">
+            <div class="space-y-4 overflow-y-auto pr-2 flex-1 relative">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-bold text-purple-300 uppercase mb-1">Judul Kuis</label>
@@ -620,11 +620,17 @@
                     <input type="text" id="edit-quiz-desc" placeholder="Deskripsi singkat kuis..." class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
                 </div>
 
-                <div class="border-t border-purple-800/80 pt-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <h4 class="font-fredoka text-lg font-bold text-pink-300">Daftar Pertanyaan</h4>
-                        <button onclick="app.addNewQuestionToEditingQuiz()" class="px-3 py-1.5 rounded-xl bg-purple-800 hover:bg-purple-700 text-xs font-bold text-white transition flex items-center space-x-1">
-                            <i class="fa-solid fa-plus"></i>
+                <!-- SECTION PERTANYAAN -->
+                <div class="border-t border-purple-800/80 pt-2">
+                    <!-- STICKY HEADER UNTUK DAFTAR PERTANYAAN & TOMBOL TAMBAH SOAL -->
+                    <div class="sticky top-0 z-10 bg-quiz-darkPurple py-2.5 border-b border-purple-800/80 flex justify-between items-center mb-3 shadow-md">
+                        <h4 class="font-fredoka text-lg font-bold text-pink-300 flex items-center space-x-2">
+                            <i class="fa-solid fa-list-ol text-sm"></i>
+                            <span>Daftar Pertanyaan</span>
+                        </h4>
+                        <!-- Tombol Tambah Soal Paling Atas (Sticky Melayang Saat Scroll) -->
+                        <button onclick="app.addNewQuestionToEditingQuiz()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-xs font-bold text-white transition flex items-center space-x-1.5 shadow-lg transform active:scale-95">
+                            <i class="fa-solid fa-plus text-sm"></i>
                             <span>Tambah Soal</span>
                         </button>
                     </div>
@@ -632,10 +638,18 @@
                     <div id="modal-questions-editor-list" class="space-y-4">
                         <!-- Dynamic Question Inputs JS -->
                     </div>
+
+                    <!-- TOMBOL TAMBAH SOAL TAMBAHAN DI BAGIAN BAWAH DAFTAR SOAL -->
+                    <div class="mt-4 pt-2">
+                        <button onclick="app.addNewQuestionToEditingQuiz()" class="w-full py-3 rounded-2xl bg-purple-900/60 hover:bg-purple-800 border-2 border-dashed border-purple-600 hover:border-pink-400 text-purple-200 hover:text-white font-bold text-sm transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-plus-circle text-base text-pink-400"></i>
+                            <span>+ Tambah Pertanyaan Baru</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="pt-4 mt-2 border-t border-purple-800/80 flex gap-3">
+            <div class="pt-4 mt-2 border-t border-purple-800/80 flex gap-3 flex-shrink-0">
                 <button onclick="app.saveEditingQuiz()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white shadow-lg transition">
                     Simpan & Sync Kuis
                 </button>
@@ -647,24 +661,24 @@
     </div>
 
     <!-- MODAL: ANTI-CHEAT WARNING -->
-    <div id="modal-anti-cheat-warning" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden anti-cheat-flash">
-        <div class="bg-red-950 border-2 border-red-500 w-full max-w-lg rounded-3xl p-6 md:p-8 shadow-2xl text-center space-y-6">
-            <div class="w-20 h-20 bg-red-600 text-white rounded-full flex items-center justify-center mx-auto text-4xl shadow-xl animate-bounce">
+    <div id="modal-anti-cheat-warning" class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto hidden anti-cheat-flash">
+        <div class="bg-red-950 border-2 border-red-500 w-full max-w-lg rounded-3xl p-5 md:p-8 shadow-2xl text-center space-y-4 md:space-y-6 my-auto max-h-[90vh] overflow-y-auto">
+            <div class="w-16 h-16 md:w-20 md:h-20 bg-red-600 text-white rounded-full flex items-center justify-center mx-auto text-3xl md:text-4xl shadow-xl animate-bounce">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
             <div>
-                <h3 class="font-fredoka text-2xl font-bold text-white mb-2">PERINGATAN SISTEM ANTI-CURANG!</h3>
-                <p class="text-red-200 text-sm md:text-base leading-relaxed bg-red-900/60 p-4 rounded-2xl border border-red-700 font-semibold">
+                <h3 class="font-fredoka text-xl md:text-2xl font-bold text-white mb-2">PERINGATAN SISTEM ANTI-CURANG!</h3>
+                <p class="text-red-200 text-xs md:text-base leading-relaxed bg-red-900/60 p-3 md:p-4 rounded-2xl border border-red-700 font-semibold">
                     Anda terdeteksi keluar dari web. Jawaban dan soal Anda akan hangus jika tidak segera kembali sebelum timer habis.
                 </p>
             </div>
             
             <div class="bg-red-900/80 border border-red-600 p-3 rounded-xl inline-block">
                 <span class="text-xs text-red-300 block">Sisa Waktu Menjawab Sebelum Hangus:</span>
-                <span id="anti-cheat-countdown" class="font-fredoka text-3xl font-bold text-yellow-300">10s</span>
+                <span id="anti-cheat-countdown" class="font-fredoka text-2xl md:text-3xl font-bold text-yellow-300">10s</span>
             </div>
 
-            <button onclick="app.dismissAntiCheatWarning()" class="w-full py-3.5 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-red-950 font-black text-lg shadow-xl transition transform active:scale-95 flex items-center justify-center space-x-2">
+            <button onclick="app.dismissAntiCheatWarning()" class="w-full py-3 md:py-3.5 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-red-950 font-black text-base md:text-lg shadow-xl transition transform active:scale-95 flex items-center justify-center space-x-2">
                 <i class="fa-solid fa-rotate-left"></i>
                 <span>Kembali Menjawab</span>
             </button>
@@ -672,8 +686,8 @@
     </div>
 
     <!-- MODAL: KICKED POP-UP -->
-    <div id="modal-anti-cheat-kicked" class="fixed inset-0 bg-black/90 backdrop-blur-lg z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-quiz-darkPurple border-2 border-red-600 w-full max-w-md rounded-3xl p-6 shadow-2xl text-center space-y-5">
+    <div id="modal-anti-cheat-kicked" class="fixed inset-0 bg-black/90 backdrop-blur-lg z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+        <div class="bg-quiz-darkPurple border-2 border-red-600 w-full max-w-md rounded-3xl p-6 shadow-2xl text-center space-y-5 my-auto max-h-[90vh] overflow-y-auto">
             <div class="w-16 h-16 bg-red-600/30 border border-red-500 text-red-400 rounded-2xl flex items-center justify-center mx-auto text-3xl">
                 <i class="fa-solid fa-ban"></i>
             </div>
@@ -1222,6 +1236,9 @@
                 document.getElementById('modal-anti-cheat-warning').classList.add('hidden');
                 this.isAntiCheatActive = false;
 
+                // Reset viewport scroll on mobile to avoid layout clipping
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
                 if (this.settings.useTimer !== false) {
                     this.startTimer();
                 }
@@ -1245,6 +1262,7 @@
 
             closeKickedModal() {
                 document.getElementById('modal-anti-cheat-kicked').classList.add('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             },
 
             openSyncModal() {
@@ -1854,6 +1872,14 @@
                     timeLimit: 15
                 });
                 this.renderQuizEditorModal();
+
+                // Auto-scroll ke soal baru yang paling bawah
+                setTimeout(() => {
+                    const listContainer = document.getElementById('modal-questions-editor-list');
+                    if (listContainer && listContainer.lastElementChild) {
+                        listContainer.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }, 100);
             },
 
             removeQuestionFromEditingQuiz(qIdx) {
