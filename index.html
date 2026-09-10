@@ -10,9 +10,16 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Canvas Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- MQTT Client Library for Real-Time Multi-Device Sync -->
+    <script src="https://cdn.jsdelivr.net/npm/mqtt@4.3.7/dist/mqtt.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
+    <!-- Chosen Palette: Quizizz Cyber Purple & Neon Accent -->
+    <!-- Application Structure Plan: Single-page Quiz application featuring real-time multi-device synchronization via WiFi IP matching and WebSocket message broadcasting. Includes multi-provider IP detection, fallback MQTT brokers for firewall bypassing, interactive quiz player, anti-cheat detection, full admin suite, and global leaderboard. -->
+    <!-- Visualization & Content Choices: Uses HTML/Tailwind dynamic components, Canvas Confetti for rewards, Web Audio API for interactive audio feedback, and MQTT WebSocket network integration. NO SVG graphics or Mermaid JS used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
     <script>
         tailwind.config = {
             theme: {
@@ -58,7 +65,6 @@
         .btn-option:active {
             transform: scale(0.98);
         }
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -100,11 +106,11 @@
             </div>
 
             <!-- Header Quick Info / Actions -->
-            <div class="flex items-center space-x-4">
-                <!-- Cloud Sync Status Badge -->
-                <div id="cloud-status-badge" class="flex items-center space-x-1.5 bg-purple-950/80 px-3 py-1 rounded-full border border-purple-700/40 text-xs font-semibold text-purple-300">
-                    <i id="cloud-status-icon" class="fa-solid fa-cloud text-purple-400"></i>
-                    <span id="cloud-status-text">Menghubungkan...</span>
+            <div class="flex items-center space-x-3 md:space-x-4">
+                <!-- IP Network Sync Status Badge -->
+                <div id="cloud-status-badge" onclick="app.openSyncModal()" class="cursor-pointer flex items-center space-x-2 bg-purple-950/80 px-3 py-1.5 rounded-full border border-purple-700/50 hover:border-pink-500/50 transition text-xs font-semibold">
+                    <i id="cloud-status-icon" class="fa-solid fa-spinner fa-spin text-amber-400"></i>
+                    <span id="cloud-status-text" class="text-amber-300">Mendeteksi Internet...</span>
                 </div>
 
                 <!-- Score Display in game -->
@@ -120,7 +126,7 @@
                     </div>
                 </div>
 
-                <!-- Hamburger Menu Button (Garis Tiga) -->
+                <!-- Hamburger Menu Button -->
                 <button id="btn-hamburger" onclick="app.toggleDrawer()" class="p-2.5 rounded-xl bg-purple-900/60 hover:bg-purple-800 text-white transition focus:outline-none border border-purple-700/50">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
@@ -128,9 +134,9 @@
         </div>
     </header>
 
-    <!-- Side Drawer Menu (Triggered by Garis Tiga) -->
+    <!-- Side Drawer Menu -->
     <div id="drawer-backdrop" onclick="app.toggleDrawer(false)" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
-    
+
     <aside id="drawer-menu" class="fixed top-0 right-0 h-full w-80 bg-quiz-darkPurple border-l border-purple-800/50 z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between p-6 shadow-2xl">
         <div>
             <!-- Drawer Header -->
@@ -154,6 +160,11 @@
                 <button onclick="app.navTo('leaderboard'); app.toggleDrawer(false);" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 text-gray-200 hover:text-white font-semibold transition border border-purple-700/30">
                     <i class="fa-solid fa-trophy text-amber-400 w-6"></i>
                     <span>Papan Skor</span>
+                </button>
+
+                <button onclick="app.openSyncModal(); app.toggleDrawer(false);" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 text-gray-200 hover:text-white font-semibold transition border border-purple-700/30">
+                    <i class="fa-solid fa-network-wired text-cyan-400 w-6"></i>
+                    <span>Status Jaringan & Sync</span>
                 </button>
 
                 <!-- Secret/Protected Admin Menu Button -->
@@ -185,13 +196,13 @@
             <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 p-6 md:p-10 border border-purple-700/40 shadow-2xl">
                 <div class="relative z-10 max-w-2xl">
                     <span class="bg-pink-500/20 text-pink-300 text-xs font-bold px-3 py-1 rounded-full border border-pink-500/30 inline-block mb-3">
-                        ⚡ Quizizz Interactive Platform
+                        ⚡ Quizizz Interactive Platform • Real-time WiFi Sync
                     </span>
                     <h1 id="welcome-message" class="font-fredoka text-3xl md:text-5xl font-bold mb-4 text-white leading-tight">
                         Asah Pengetahuanmu Sekarang!
                     </h1>
                     <p class="text-purple-200 text-sm md:text-base mb-6">
-                        Pilih kuis interaktif di bawah atau masukkan Kode PIN kuis dari gurumu.
+                        Pilih kuis interaktif di bawah atau masukkan Kode PIN kuis dari gurumu. Kuis yang dibuat di HP/Laptop mana saja langsung tersinkronisasi otomatis ke seluruh perangkat pada jaringan WiFi yang sama!
                     </p>
 
                     <!-- Join PIN Form -->
@@ -218,13 +229,19 @@
                         <i class="fa-solid fa-fire-flame-curved text-amber-400"></i>
                         <span>Daftar Kuis Tersedia</span>
                     </h2>
-                    <span id="quiz-count-badge" class="text-xs font-semibold bg-purple-900/60 border border-purple-700 px-3 py-1 rounded-full text-purple-300">
-                        0 Kuis
-                    </span>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="syncEngine.requestSync()" title="Sinkronkan ulang" class="px-3 py-1.5 bg-purple-900/80 hover:bg-purple-800 border border-purple-700 rounded-full text-xs text-purple-200 transition flex items-center space-x-1">
+                            <i class="fa-solid fa-rotate"></i>
+                            <span class="hidden sm:inline">Sync Kuis</span>
+                        </button>
+                        <span id="quiz-count-badge" class="text-xs font-semibold bg-purple-900/60 border border-purple-700 px-3 py-1.5 rounded-full text-purple-300">
+                            0 Kuis
+                        </span>
+                    </div>
                 </div>
 
                 <div id="quiz-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Quiz Cards Will Be Injected JS -->
+                    <!-- Quiz Cards Injected via JS -->
                 </div>
             </div>
         </section>
@@ -260,18 +277,18 @@
                     Loading soal...
                 </h2>
 
-                <!-- Question Optional Image / Graphic Placeholder -->
+                <!-- Question Optional Image -->
                 <div id="question-image-container" class="mt-4 hidden">
                     <img id="question-image" src="" alt="Soal Media" class="max-h-48 rounded-xl border border-purple-600/50 object-contain mx-auto shadow-md">
                 </div>
             </div>
 
-            <!-- Answer Options Grid (4 Quizizz Colors) -->
+            <!-- Answer Options Grid -->
             <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Option buttons generated via JS -->
             </div>
 
-            <!-- Feedback Overlay (Shows when answered) -->
+            <!-- Feedback Overlay -->
             <div id="answer-feedback-banner" class="hidden p-4 rounded-2xl text-center font-bold text-xl transition-all duration-300 animate-bounce">
                 <span id="feedback-message">Jawaban Benar!</span>
             </div>
@@ -280,7 +297,6 @@
         <!-- VIEW 3: RESULTS SUMMARY -->
         <section id="view-results" class="hidden max-w-2xl mx-auto text-center space-y-6">
             <div class="bg-quiz-darkPurple border border-purple-700/60 p-8 rounded-3xl shadow-2xl space-y-6 relative overflow-hidden">
-                <!-- Confetti Anchor Header -->
                 <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-400 to-yellow-300 text-purple-950 flex items-center justify-center text-4xl shadow-xl font-fredoka">
                     🏆
                 </div>
@@ -353,95 +369,6 @@
                 </div>
             </div>
         </section>
-
-        <!-- MODAL: ADMIN PASSWORD PROMPT -->
-        <div id="modal-admin-auth" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-            <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl relative animate-scale-up">
-                <button onclick="app.closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-
-                <div class="text-center space-y-3 mb-6">
-                    <div class="w-16 h-16 bg-pink-500/20 text-pink-400 border border-pink-500/40 rounded-2xl flex items-center justify-center mx-auto text-2xl">
-                        <i class="fa-solid fa-key"></i>
-                    </div>
-                    <h3 class="font-fredoka text-2xl font-bold text-white">Otentikasi Web Admin</h3>
-                    <p class="text-purple-300 text-sm">Masukkan password rahasia untuk mengubah soal & tampilan.</p>
-                </div>
-
-                <form onsubmit="app.verifyAdminPassword(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-purple-300 mb-1">Password Admin</label>
-                        <div class="relative">
-                            <input type="password" id="admin-password-input" placeholder="••••••" 
-                                class="w-full px-4 py-3 rounded-xl bg-purple-950 border-2 border-purple-700 text-white text-center tracking-widest text-lg focus:outline-none focus:border-pink-500">
-                        </div>
-                        <p id="admin-auth-error" class="text-red-400 text-xs font-semibold mt-1 hidden text-center">
-                            Password salah! Coba lagi.
-                        </p>
-                    </div>
-
-                    <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white shadow-lg transition">
-                        Masuk Panel Admin
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- MODAL: EDIT / CREATE QUIZ -->
-        <div id="modal-edit-quiz" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
-            <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-2xl rounded-3xl p-6 md:p-8 shadow-2xl relative my-8 max-h-[90vh] flex flex-col">
-                <button onclick="app.closeEditQuizModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-
-                <h3 class="font-fredoka text-2xl font-bold text-white mb-4 flex items-center space-x-2">
-                    <i class="fa-solid fa-pen-to-square text-pink-400"></i>
-                    <span>Editor Kuis & Soal</span>
-                </h3>
-
-                <div class="space-y-4 overflow-y-auto pr-2 flex-1">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div class="sm:col-span-2">
-                            <label class="block text-xs font-bold text-purple-300 uppercase mb-1">Judul Kuis</label>
-                            <input type="text" id="edit-quiz-title" placeholder="Nama Kuis..." class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-purple-300 uppercase mb-1">PIN Kuis</label>
-                            <input type="text" id="edit-quiz-pin" placeholder="1234" class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-purple-300 uppercase mb-1">Deskripsi Ringkas</label>
-                        <input type="text" id="edit-quiz-desc" placeholder="Deskripsi singkat kuis..." class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
-                    </div>
-
-                    <div class="border-t border-purple-800/80 pt-4">
-                        <div class="flex justify-between items-center mb-3">
-                            <h4 class="font-fredoka text-lg font-bold text-pink-300">Daftar Pertanyaan</h4>
-                            <button onclick="app.addNewQuestionToEditingQuiz()" class="px-3 py-1.5 rounded-xl bg-purple-800 hover:bg-purple-700 text-xs font-bold text-white transition flex items-center space-x-1">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>Tambah Soal</span>
-                            </button>
-                        </div>
-
-                        <div id="modal-questions-editor-list" class="space-y-4">
-                            <!-- Dynamic Question Inputs JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-4 mt-2 border-t border-purple-800/80 flex gap-3">
-                    <button onclick="app.saveEditingQuiz()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white shadow-lg transition">
-                        Simpan Kuis
-                    </button>
-                    <button onclick="app.closeEditQuizModal()" class="px-5 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-sm transition">
-                        Batal
-                    </button>
-                </div>
-            </div>
-        </div>
 
         <!-- VIEW 5: ADMIN PANEL -->
         <section id="view-admin" class="hidden space-y-8">
@@ -566,7 +493,160 @@
         © Copyright 2026 Auraphone Systems, All Right Reserved.
     </footer>
 
-    <!-- MODAL: ANTI-CHEAT / ANTI-AI WARNING -->
+    <!-- MODAL: NETWORK / SYNC STATUS & SETTINGS -->
+    <div id="modal-network-sync" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-quiz-darkPurple border border-cyan-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl relative">
+            <button onclick="app.closeSyncModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <div class="text-center space-y-3 mb-6">
+                <div class="w-16 h-16 bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 rounded-2xl flex items-center justify-center mx-auto text-3xl">
+                    <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <h3 class="font-fredoka text-2xl font-bold text-white">Sinkronisasi WiFi / Jaringan</h3>
+                <p class="text-purple-300 text-xs leading-relaxed">
+                    Perangkat yang terhubung ke **WiFi / Router yang sama** akan saling berbagi kuis secara langsung secara otomatis.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-purple-950 p-4 rounded-2xl border border-purple-800 space-y-2">
+                    <div class="flex justify-between items-center text-xs text-purple-300">
+                        <span>Status Browser / Laptop:</span>
+                        <span id="sync-modal-browser-online" class="font-bold text-green-400">Online</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-purple-300">
+                        <span>Alamat IP WiFi Publik:</span>
+                        <span id="sync-modal-ip-val" class="font-bold text-cyan-300">Mendeteksi...</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-purple-300">
+                        <span>Status Relay WebSocket:</span>
+                        <span id="sync-modal-status-val" class="font-bold text-green-400">Tersambung</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-purple-300">
+                        <span>ID Ruang Sync Saat Ini:</span>
+                        <span id="sync-modal-channel-val" class="font-mono text-amber-300 text-[11px]">wifi_default</span>
+                    </div>
+                </div>
+
+                <div id="sync-modal-troubleshoot" class="bg-amber-950/40 border border-amber-500/30 p-3 rounded-xl text-[11px] text-amber-200/90 hidden leading-relaxed">
+                    <p class="font-bold mb-1 text-amber-300"><i class="fa-solid fa-circle-info mr-1"></i>Catatan Koneksi Internet:</p>
+                    <p>Browser Anda terhubung ke internet, namun layanan penentu IP / WebSocket terhalang AdBlocker atau WiFi Firewall. Anda tetap bisa bermain kuis secara lokal atau memasukkan **Kode Ruang** di bawah!</p>
+                </div>
+
+                <div class="border-t border-purple-800 pt-3">
+                    <label class="block text-xs font-bold text-purple-300 uppercase mb-1">Ganti Kode Ruang Manual (Opsional)</label>
+                    <p class="text-[11px] text-purple-400 mb-2">Ketik Kode Ruang yang sama di kedua HP/Laptop untuk menghubungkan kuis secara spesifik:</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="custom-room-input" placeholder="mis: kelas_6a" 
+                            class="flex-1 px-3 py-2 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-cyan-500">
+                        <button onclick="syncEngine.setCustomRoom()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-xs transition">
+                            Terapkan
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex gap-2">
+                    <button onclick="syncEngine.requestSync(); app.closeSyncModal();" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 font-bold text-white text-sm shadow-lg hover:from-purple-500 hover:to-pink-500 transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>Paksa Reconnect & Sync</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ADMIN PASSWORD PROMPT -->
+    <div id="modal-admin-auth" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl relative">
+            <button onclick="app.closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <div class="text-center space-y-3 mb-6">
+                <div class="w-16 h-16 bg-pink-500/20 text-pink-400 border border-pink-500/40 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+                <h3 class="font-fredoka text-2xl font-bold text-white">Otentikasi Web Admin</h3>
+                <p class="text-purple-300 text-sm">Masukkan password rahasia untuk mengubah soal & tampilan.</p>
+            </div>
+
+            <form onsubmit="app.verifyAdminPassword(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-purple-300 mb-1">Password Admin</label>
+                    <div class="relative">
+                        <input type="password" id="admin-password-input" placeholder="••••••" 
+                            class="w-full px-4 py-3 rounded-xl bg-purple-950 border-2 border-purple-700 text-white text-center tracking-widest text-lg focus:outline-none focus:border-pink-500">
+                    </div>
+                    <p id="admin-auth-error" class="text-red-400 text-xs font-semibold mt-1 hidden text-center">
+                        Password salah! Coba lagi.
+                    </p>
+                </div>
+
+                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white shadow-lg transition">
+                    Masuk Panel Admin
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: EDIT / CREATE QUIZ -->
+    <div id="modal-edit-quiz" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
+        <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-2xl rounded-3xl p-6 md:p-8 shadow-2xl relative my-8 max-h-[90vh] flex flex-col">
+            <button onclick="app.closeEditQuizModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <h3 class="font-fredoka text-2xl font-bold text-white mb-4 flex items-center space-x-2">
+                <i class="fa-solid fa-pen-to-square text-pink-400"></i>
+                <span>Editor Kuis & Soal</span>
+            </h3>
+
+            <div class="space-y-4 overflow-y-auto pr-2 flex-1">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-bold text-purple-300 uppercase mb-1">Judul Kuis</label>
+                        <input type="text" id="edit-quiz-title" placeholder="Nama Kuis..." class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-purple-300 uppercase mb-1">PIN Kuis</label>
+                        <input type="text" id="edit-quiz-pin" placeholder="1234" class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-purple-300 uppercase mb-1">Deskripsi Ringkas</label>
+                    <input type="text" id="edit-quiz-desc" placeholder="Deskripsi singkat kuis..." class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
+                </div>
+
+                <div class="border-t border-purple-800/80 pt-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-fredoka text-lg font-bold text-pink-300">Daftar Pertanyaan</h4>
+                        <button onclick="app.addNewQuestionToEditingQuiz()" class="px-3 py-1.5 rounded-xl bg-purple-800 hover:bg-purple-700 text-xs font-bold text-white transition flex items-center space-x-1">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Tambah Soal</span>
+                        </button>
+                    </div>
+
+                    <div id="modal-questions-editor-list" class="space-y-4">
+                        <!-- Dynamic Question Inputs JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 mt-2 border-t border-purple-800/80 flex gap-3">
+                <button onclick="app.saveEditingQuiz()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white shadow-lg transition">
+                    Simpan & Sync Kuis
+                </button>
+                <button onclick="app.closeEditQuizModal()" class="px-5 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-sm transition">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ANTI-CHEAT WARNING -->
     <div id="modal-anti-cheat-warning" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden anti-cheat-flash">
         <div class="bg-red-950 border-2 border-red-500 w-full max-w-lg rounded-3xl p-6 md:p-8 shadow-2xl text-center space-y-6">
             <div class="w-20 h-20 bg-red-600 text-white rounded-full flex items-center justify-center mx-auto text-4xl shadow-xl animate-bounce">
@@ -575,7 +655,7 @@
             <div>
                 <h3 class="font-fredoka text-2xl font-bold text-white mb-2">PERINGATAN SISTEM ANTI-CURANG!</h3>
                 <p class="text-red-200 text-sm md:text-base leading-relaxed bg-red-900/60 p-4 rounded-2xl border border-red-700 font-semibold">
-                    Anda terdeteksi keluar dari web, konsekuensinya, ketika anda keluar dari Web ini, jawaban dan soal anda akan hangus. ketuk Kembali untuk Melanjutkan pertanyaan sebelum timer habis
+                    Anda terdeteksi keluar dari web. Jawaban dan soal Anda akan hangus jika tidak segera kembali sebelum timer habis.
                 </p>
             </div>
             
@@ -586,12 +666,12 @@
 
             <button onclick="app.dismissAntiCheatWarning()" class="w-full py-3.5 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-red-950 font-black text-lg shadow-xl transition transform active:scale-95 flex items-center justify-center space-x-2">
                 <i class="fa-solid fa-rotate-left"></i>
-                <span>Kembali</span>
+                <span>Kembali Menjawab</span>
             </button>
         </div>
     </div>
 
-    <!-- MODAL: KICKED / EXITED POP-UP -->
+    <!-- MODAL: KICKED POP-UP -->
     <div id="modal-anti-cheat-kicked" class="fixed inset-0 bg-black/90 backdrop-blur-lg z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-quiz-darkPurple border-2 border-red-600 w-full max-w-md rounded-3xl p-6 shadow-2xl text-center space-y-5">
             <div class="w-16 h-16 bg-red-600/30 border border-red-500 text-red-400 rounded-2xl flex items-center justify-center mx-auto text-3xl">
@@ -599,7 +679,7 @@
             </div>
             <h3 class="font-fredoka text-2xl font-bold text-white">Kuis Dibatalkan</h3>
             <p id="kicked-message-text" class="text-purple-200 text-sm leading-relaxed bg-purple-950 p-4 rounded-2xl border border-purple-800">
-                Anda telah Keluar dari Kuis silakan untuk mulai ulang dari awal
+                Anda telah keluar dari Kuis, silakan mulai ulang dari awal.
             </p>
             <button onclick="app.closeKickedModal()" class="w-full py-3 rounded-xl bg-purple-700 hover:bg-purple-600 font-bold text-white transition">
                 Mengerti & Kembali
@@ -613,86 +693,267 @@
         <span id="toast-message" class="text-sm font-semibold">Notifikasi</span>
     </div>
 
-    <!-- Firebase Standard ESM Module imports for real-time synchronization -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- REAL-TIME NETWORK & MULTI-DEVICE SYNC ENGINE -->
+    <script>
+        window.syncEngine = {
+            client: null,
+            publicIp: null,
+            channelId: 'auraphone_wifi_default',
+            isConnected: false,
+            currentBrokerIdx: 0,
 
-        // Global shared appId ensuring all devices sync to the same document
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'auraphone-quiz-global-v1';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "dummy-key",
-            authDomain: "dummy.firebaseapp.com",
-            projectId: "dummy-project",
-            storageBucket: "dummy.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:dummy"
-        };
+            // Multiple broker redundancy for WebSockets firewall bypassing
+            mqttBrokers: [
+                'wss://broker.hivemq.com:8884/mqtt',
+                'wss://broker.emqx.io:8084/mqtt'
+            ],
 
-        try {
-            const firebaseApp = initializeApp(firebaseConfig);
-            const auth = getAuth(firebaseApp);
-            const db = getFirestore(firebaseApp);
+            async init() {
+                // Listen to native browser online/offline events
+                window.addEventListener('online', () => {
+                    this.updateUIStatus();
+                    this.requestSync();
+                });
+                window.addEventListener('offline', () => {
+                    this.updateUIStatus();
+                });
 
-            let authPromise = null;
+                // Multi-provider public IP detection algorithm with timeouts
+                let detectedIp = null;
+                const ipProviders = [
+                    'https://api.ipify.org?format=json',
+                    'https://api.db-ip.com/v2/free/myip',
+                    'https://ipapi.co/json/'
+                ];
 
-            window.cloudSync = {
-                enabled: true,
-                db,
-                auth,
-                async initAuth() {
-                    if (authPromise) return authPromise;
-                    authPromise = new Promise((resolve) => {
-                        onAuthStateChanged(auth, async (user) => {
-                            if (user) {
-                                resolve(user);
-                            } else {
-                                try {
-                                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                                        await signInWithCustomToken(auth, __initial_auth_token);
-                                    } else {
-                                        await signInAnonymously(auth);
-                                    }
-                                } catch (e) {
-                                    console.warn("Firebase Auth fallback silently:", e);
-                                    resolve(null);
-                                }
-                            }
-                        });
-                    });
-                    return authPromise;
-                },
-                listenData(key, callback) {
-                    this.initAuth().then((user) => {
-                        if (!user && !auth.currentUser) return;
-                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_state', key);
-                        return onSnapshot(docRef, (snapshot) => {
-                            if (snapshot.exists() && snapshot.data()?.payload) {
-                                callback(snapshot.data().payload);
-                            }
-                        }, (err) => console.warn("Firestore snapshot error:", err));
-                    });
-                },
-                async saveData(key, data) {
-                    await this.initAuth();
-                    const currentUser = auth.currentUser;
-                    if (!currentUser) return;
+                for (const url of ipProviders) {
                     try {
-                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_state', key);
-                        await setDoc(docRef, { payload: data, updatedAt: new Date().toISOString() }, { merge: true });
-                        if (window.app && window.app.updateCloudBadge) {
-                            window.app.updateCloudBadge(true);
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 2500); // 2.5s max timeout
+                        const res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+                        clearTimeout(timeoutId);
+                        
+                        if (res.ok) {
+                            const data = await res.json();
+                            detectedIp = data.ip || data.ipAddress;
+                            if (detectedIp) break;
                         }
                     } catch (e) {
-                        console.warn("Firestore save error:", e);
+                        console.warn("IP Provider timeout or block:", url);
                     }
                 }
-            };
-        } catch (err) {
-            console.warn("Firebase initialized in local-only fallback mode:", err);
-            window.cloudSync = { enabled: false };
-        }
+
+                if (detectedIp) {
+                    this.publicIp = detectedIp;
+                    const sanitizedIp = detectedIp.replace(/[^a-zA-Z0-9]/g, '_');
+                    const customRoom = localStorage.getItem('auraphone_custom_room');
+                    this.channelId = customRoom ? 'custom_' + customRoom.trim().toLowerCase().replace(/[^a-zA-Z0-9]/g, '_') : 'wifi_' + sanitizedIp;
+                } else {
+                    const customRoom = localStorage.getItem('auraphone_custom_room');
+                    this.channelId = customRoom ? 'custom_' + customRoom : 'global_default_room';
+                    this.publicIp = navigator.onLine ? 'Terhubung (IP Publik Terblokir)' : 'Lokal / Offline';
+                }
+
+                this.updateUIStatus();
+                this.connectMQTT();
+            },
+
+            connectMQTT() {
+                if (typeof mqtt === 'undefined') {
+                    console.warn("MQTT library loading...");
+                    setTimeout(() => this.connectMQTT(), 1000);
+                    return;
+                }
+
+                // Close existing connection if any
+                if (this.client) {
+                    try { this.client.end(true); } catch(e){}
+                }
+
+                const currentBrokerUrl = this.mqttBrokers[this.currentBrokerIdx];
+
+                try {
+                    this.client = mqtt.connect(currentBrokerUrl, {
+                        clientId: 'auraphone_' + Math.random().toString(16).substring(2, 10),
+                        keepalive: 45,
+                        clean: true,
+                        connectTimeout: 5000
+                    });
+
+                    this.client.on('connect', () => {
+                        this.isConnected = true;
+                        const topic = `auraphone_quiz/sync/${this.channelId}`;
+                        this.client.subscribe(topic, { qos: 1 });
+
+                        this.updateUIStatus();
+
+                        // Request latest quizzes from other active devices on the same WiFi
+                        this.broadcast('REQUEST_SYNC', {});
+
+                        // Publish current quizzes after slight delay
+                        setTimeout(() => this.broadcastState(), 600);
+                    });
+
+                    this.client.on('message', (topic, message) => {
+                        try {
+                            const packet = JSON.parse(message.toString());
+                            if (packet.senderId === this.client.options.clientId) return; // Skip self
+
+                            this.handleIncomingPacket(packet);
+                        } catch (e) {
+                            console.error("Parse sync packet failed:", e);
+                        }
+                    });
+
+                    this.client.on('error', (err) => {
+                        console.warn("Sync Broker Error on " + currentBrokerUrl, err);
+                        this.handleConnectionFailure();
+                    });
+
+                    this.client.on('offline', () => {
+                        this.isConnected = false;
+                        this.updateUIStatus();
+                    });
+
+                } catch (e) {
+                    console.warn("Sync Init Failed:", e);
+                    this.handleConnectionFailure();
+                }
+            },
+
+            handleConnectionFailure() {
+                this.isConnected = false;
+                this.updateUIStatus();
+
+                // Rotate broker on failure
+                this.currentBrokerIdx = (this.currentBrokerIdx + 1) % this.mqttBrokers.length;
+            },
+
+            broadcast(type, payload) {
+                if (!this.client || !this.isConnected) return;
+                const topic = `auraphone_quiz/sync/${this.channelId}`;
+                const packet = JSON.stringify({
+                    type,
+                    payload,
+                    senderId: this.client.options.clientId,
+                    timestamp: Date.now()
+                });
+                this.client.publish(topic, packet, { qos: 1, retain: false });
+            },
+
+            broadcastState() {
+                this.broadcast('FULL_STATE', {
+                    quizzes: app.quizzes,
+                    settings: app.settings,
+                    leaderboard: app.leaderboard
+                });
+            },
+
+            requestSync() {
+                if (this.isConnected) {
+                    this.broadcast('REQUEST_SYNC', {});
+                    app.showToast('Meminta sinkronisasi dari jaringan...', 'fa-rotate');
+                } else {
+                    app.showToast('Menghubungkan ulang ke server sync...', 'fa-wifi');
+                    this.connectMQTT();
+                }
+            },
+
+            handleIncomingPacket(packet) {
+                if (packet.type === 'REQUEST_SYNC') {
+                    // Send local state to newly joined device on network
+                    this.broadcastState();
+                } else if (packet.type === 'FULL_STATE' || packet.type === 'UPDATE_QUIZZES') {
+                    if (packet.payload && packet.payload.quizzes && Array.isArray(packet.payload.quizzes)) {
+                        app.quizzes = packet.payload.quizzes;
+                        localStorage.setItem('quizizz_quizzes', JSON.stringify(app.quizzes));
+                        app.renderHomeQuizzes();
+                        if (app.currentView === 'admin') app.renderAdminDashboard();
+                        app.showToast('Kuis ter-update dari perangkat lain! 🔄', 'fa-wifi');
+                    }
+                    if (packet.payload && packet.payload.settings) {
+                        app.settings = packet.payload.settings;
+                        localStorage.setItem('quizizz_settings', JSON.stringify(app.settings));
+                        app.applySettings();
+                    }
+                    if (packet.payload && packet.payload.leaderboard) {
+                        app.leaderboard = packet.payload.leaderboard;
+                        localStorage.setItem('quizizz_leaderboard', JSON.stringify(app.leaderboard));
+                        app.renderLeaderboard();
+                    }
+                }
+            },
+
+            setCustomRoom() {
+                const roomInput = document.getElementById('custom-room-input').value.trim();
+                if (!roomInput) {
+                    localStorage.removeItem('auraphone_custom_room');
+                    app.showToast('Menggunakan IP WiFi default kembali');
+                } else {
+                    localStorage.setItem('auraphone_custom_room', roomInput);
+                    app.showToast(`Kode Ruang Sync diubah ke: ${roomInput}`);
+                }
+                if (this.client) this.client.end();
+                this.init();
+            },
+
+            updateUIStatus() {
+                const badgeText = document.getElementById('cloud-status-text');
+                const badgeIcon = document.getElementById('cloud-status-icon');
+                
+                const isOnlineNative = navigator.onLine;
+                const customRoom = localStorage.getItem('auraphone_custom_room');
+
+                let displayStr = 'Lokal (Offline)';
+                if (customRoom) {
+                    displayStr = `Room: ${customRoom}`;
+                } else if (this.publicIp && !this.publicIp.includes('Offline')) {
+                    displayStr = `WiFi: ${this.publicIp}`;
+                } else if (isOnlineNative) {
+                    displayStr = 'Internet Aktif';
+                }
+
+                if (this.isConnected) {
+                    if (badgeText) {
+                        badgeText.innerText = displayStr;
+                        badgeText.className = 'text-green-300 font-semibold';
+                    }
+                    if (badgeIcon) badgeIcon.className = 'fa-solid fa-wifi text-green-400';
+                } else {
+                    if (badgeText) {
+                        badgeText.innerText = isOnlineNative ? 'Internet OK (Relay Standby)' : 'Offline';
+                        badgeText.className = isOnlineNative ? 'text-cyan-300 font-semibold' : 'text-purple-300 font-semibold';
+                    }
+                    if (badgeIcon) badgeIcon.className = isOnlineNative ? 'fa-solid fa-globe text-cyan-400' : 'fa-solid fa-cloud-slash text-purple-400';
+                }
+
+                // Modal stats update
+                const browserOnlineVal = document.getElementById('sync-modal-browser-online');
+                const ipVal = document.getElementById('sync-modal-ip-val');
+                const statusVal = document.getElementById('sync-modal-status-val');
+                const channelVal = document.getElementById('sync-modal-channel-val');
+                const troubleshootBox = document.getElementById('sync-modal-troubleshoot');
+
+                if (browserOnlineVal) {
+                    browserOnlineVal.innerText = isOnlineNative ? 'Terhubung (Online)' : 'Terputus (Offline)';
+                    browserOnlineVal.className = isOnlineNative ? 'font-bold text-green-400' : 'font-bold text-red-400';
+                }
+                if (ipVal) ipVal.innerText = this.publicIp || (isOnlineNative ? 'Terhubung' : 'Lokal / Offline');
+                if (statusVal) {
+                    statusVal.innerText = this.isConnected ? 'Tersambung Real-time' : (isOnlineNative ? 'Standby / Lokal' : 'Offline');
+                    statusVal.className = this.isConnected ? 'font-bold text-green-400' : 'font-bold text-amber-400';
+                }
+                if (channelVal) channelVal.innerText = this.channelId;
+
+                if (troubleshootBox) {
+                    if (isOnlineNative && !this.isConnected) {
+                        troubleshootBox.classList.remove('hidden');
+                    } else {
+                        troubleshootBox.classList.add('hidden');
+                    }
+                }
+            }
+        };
     </script>
 
     <!-- JAVASCRIPT APP ENGINE -->
@@ -834,7 +1095,7 @@
 
         // MAIN APP APPLICATION OBJECT
         const app = {
-            adminPassword: "060312", // Password admin requested by user
+            adminPassword: "060312", // Default Password Admin
             isAdminLoggedIn: false,
             quizzes: [],
             leaderboard: [],
@@ -872,55 +1133,9 @@
                 this.renderHomeQuizzes();
                 this.renderLeaderboard();
                 this.setupAntiCheatListeners();
-                this.initCloudSync();
-            },
-
-            async initCloudSync() {
-                if (window.cloudSync && window.cloudSync.initAuth) {
-                    const user = await window.cloudSync.initAuth();
-                    this.updateCloudBadge(!!user);
-
-                    window.cloudSync.listenData('quizzes', (data) => {
-                        if (data && Array.isArray(data)) {
-                            this.quizzes = data;
-                            localStorage.setItem('quizizz_quizzes', JSON.stringify(data));
-                            this.renderHomeQuizzes();
-                            if (this.currentView === 'admin') this.renderAdminDashboard();
-                        }
-                    });
-                    window.cloudSync.listenData('settings', (data) => {
-                        if (data) {
-                            this.settings = data;
-                            localStorage.setItem('quizizz_settings', JSON.stringify(data));
-                            this.applySettings();
-                        }
-                    });
-                    window.cloudSync.listenData('leaderboard', (data) => {
-                        if (data && Array.isArray(data)) {
-                            this.leaderboard = data;
-                            localStorage.setItem('quizizz_leaderboard', JSON.stringify(data));
-                            this.renderLeaderboard();
-                        }
-                    });
-                } else {
-                    this.updateCloudBadge(false);
-                }
-            },
-
-            updateCloudBadge(isOnline) {
-                const badgeText = document.getElementById('cloud-status-text');
-                const badgeIcon = document.getElementById('cloud-status-icon');
-                if (badgeText && badgeIcon) {
-                    if (isOnline) {
-                        badgeText.innerText = 'Tersinkron Cloud';
-                        badgeText.className = 'text-green-300';
-                        badgeIcon.className = 'fa-solid fa-cloud-check text-green-400';
-                    } else {
-                        badgeText.innerText = 'Mode Lokal';
-                        badgeText.className = 'text-purple-300';
-                        badgeIcon.className = 'fa-solid fa-cloud text-purple-400';
-                    }
-                }
+                
+                // Initialize cross-device WiFi network sync
+                syncEngine.init();
             },
 
             loadFromStorage() {
@@ -942,11 +1157,8 @@
                 localStorage.setItem('quizizz_settings', JSON.stringify(this.settings));
                 localStorage.setItem('quizizz_leaderboard', JSON.stringify(this.leaderboard));
 
-                if (window.cloudSync && window.cloudSync.saveData) {
-                    window.cloudSync.saveData('quizzes', this.quizzes);
-                    window.cloudSync.saveData('settings', this.settings);
-                    window.cloudSync.saveData('leaderboard', this.leaderboard);
-                }
+                // Broadcast updated state to all devices on same WiFi/Network
+                syncEngine.broadcastState();
             },
 
             applySettings() {
@@ -987,7 +1199,7 @@
 
             triggerAntiCheatWarning() {
                 this.isAntiCheatActive = true;
-                clearInterval(this.timerInterval); // Pause question timer
+                clearInterval(this.timerInterval);
                 soundFX.startAlarm();
 
                 this.antiCheatCountdownVal = parseInt(this.settings.antiCheatTimer) || 10;
@@ -1010,7 +1222,6 @@
                 document.getElementById('modal-anti-cheat-warning').classList.add('hidden');
                 this.isAntiCheatActive = false;
 
-                // Resume question timer
                 if (this.settings.useTimer !== false) {
                     this.startTimer();
                 }
@@ -1026,7 +1237,7 @@
 
                 const quizName = this.currentQuiz ? this.currentQuiz.title : 'Kuis';
                 document.getElementById('kicked-message-text').innerText = 
-                    `Anda telah Keluar dari Kuis (${quizName}) silakan untuk mulai ulang dari awal`;
+                    `Anda telah keluar dari Kuis (${quizName}). Silakan mulai ulang dari awal.`;
 
                 this.navTo('home');
                 document.getElementById('modal-anti-cheat-kicked').classList.remove('hidden');
@@ -1034,6 +1245,16 @@
 
             closeKickedModal() {
                 document.getElementById('modal-anti-cheat-kicked').classList.add('hidden');
+            },
+
+            openSyncModal() {
+                syncEngine.updateUIStatus();
+                document.getElementById('custom-room-input').value = localStorage.getItem('auraphone_custom_room') || '';
+                document.getElementById('modal-network-sync').classList.remove('hidden');
+            },
+
+            closeSyncModal() {
+                document.getElementById('modal-network-sync').classList.add('hidden');
             },
 
             navTo(viewId) {
@@ -1047,7 +1268,6 @@
                 const target = document.getElementById(`view-${viewId}`);
                 if (target) target.classList.remove('hidden');
 
-                // Header stats visibility
                 const statsHeader = document.getElementById('game-stats-header');
                 if (viewId === 'play') {
                     statsHeader.classList.remove('hidden');
@@ -1098,7 +1318,7 @@
                     container.innerHTML = `
                         <div class="col-span-full text-center py-12 bg-purple-950/40 rounded-3xl border border-purple-800">
                             <i class="fa-solid fa-folder-open text-4xl text-purple-400 mb-2"></i>
-                            <p class="text-purple-300">Belum ada kuis tersedia. Minta Admin membuat kuis!</p>
+                            <p class="text-purple-300">Belum ada kuis tersedia. Buat kuis di Admin panel!</p>
                         </div>
                     `;
                     return;
@@ -1170,11 +1390,9 @@
                 const q = this.currentQuiz.questions[this.currentQuestionIdx];
                 const totalQ = this.currentQuiz.questions.length;
 
-                // Progress update
                 document.getElementById('question-progress-text').innerText = `Soal ${this.currentQuestionIdx + 1}/${totalQ}`;
                 document.getElementById('question-progress-bar').style.width = `${((this.currentQuestionIdx + 1) / totalQ) * 100}%`;
 
-                // Question Text
                 document.getElementById('question-text').innerText = q.question;
 
                 const qType = q.type || 'multiple_choice';
@@ -1192,7 +1410,6 @@
                         </div>
                     `;
                 } else {
-                    // Options (Quizizz Color Scheme)
                     const colors = [
                         { bg: 'bg-quiz-red hover:bg-red-700', border: 'border-red-500', icon: 'fa-circle' },
                         { bg: 'bg-quiz-blue hover:bg-blue-700', border: 'border-blue-500', icon: 'fa-diamond' },
@@ -1211,11 +1428,9 @@
                     }).join('');
                 }
 
-                // Reset feedback
                 const feedbackBanner = document.getElementById('answer-feedback-banner');
                 feedbackBanner.classList.add('hidden');
 
-                // Timer setup
                 const timerContainer = document.getElementById('game-timer-container');
                 if (this.settings.useTimer !== false) {
                     timerContainer.classList.remove('hidden');
@@ -1240,9 +1455,9 @@
                         clearInterval(this.timerInterval);
                         const q = this.currentQuiz.questions[this.currentQuestionIdx];
                         if (q.type === 'essay') {
-                            this.submitEssayAnswer(true); // timeout
+                            this.submitEssayAnswer(true);
                         } else {
-                            this.submitAnswer(-1); // Timeout
+                            this.submitAnswer(-1);
                         }
                     }
                 }, 1000);
@@ -1275,7 +1490,6 @@
                             isCorrect = userAnsLower.includes(keyAns);
                         }
                     } else {
-                        // If no key answer specified, non-empty response earns points
                         isCorrect = userAns.length > 0;
                     }
                 }
@@ -1304,7 +1518,6 @@
                     if (this.streak > this.maxStreak) this.maxStreak = this.streak;
                     this.correctAnswersCount++;
 
-                    // Speed bonus logic
                     const speedBonus = this.settings.useTimer ? Math.round((this.timeLeft / (questionObj.timeLimit || 15)) * 500) : 300;
                     const questionPoints = 1000 + speedBonus + (this.streak > 1 ? 200 : 0);
                     this.score += questionPoints;
@@ -1330,7 +1543,6 @@
                 feedbackBanner.classList.remove('hidden');
                 this.updateHeaderStats();
 
-                // Highlight buttons if multiple choice
                 if (questionObj.type !== 'essay') {
                     const buttons = document.querySelectorAll('#options-container button');
                     buttons.forEach((btn, idx) => {
@@ -1366,7 +1578,6 @@
 
                 this.navTo('results');
 
-                // Trigger confetti celebration
                 if (typeof confetti === 'function') {
                     confetti({
                         particleCount: 100,
@@ -1586,7 +1797,6 @@
                                         class="w-full px-3 py-2 rounded-xl bg-purple-900/80 border border-purple-700 text-yellow-200 text-xs focus:outline-none">
                                 </div>
                             ` : `
-                                <!-- Options Inputs -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
                                     ${(quest.options || ['A', 'B', 'C', 'D']).map((opt, oIdx) => `
                                         <div class="flex items-center space-x-2 bg-purple-900/40 p-1.5 rounded-xl border border-purple-800">
@@ -1670,7 +1880,7 @@
                 this.saveStorage();
                 this.closeEditQuizModal();
                 this.renderAdminDashboard();
-                this.showToast('Kuis berhasil disimpan!');
+                this.showToast('Kuis disimpan & disinkronkan ke perangkat lain!');
             },
 
             closeEditQuizModal() {
@@ -1709,12 +1919,13 @@
                     this.loadFromStorage();
                     this.applySettings();
                     this.renderAdminDashboard();
+                    this.saveStorage();
                     this.showToast('Sistem direset ke kondisi awal.');
                 }
             }
         };
 
-        // Bootstrap application on window load
+        // Initialize application on window load
         window.onload = () => {
             app.init();
         };
