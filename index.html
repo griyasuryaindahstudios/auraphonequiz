@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Chosen Palette: Quizizz Cyber Purple & Neon Accent -->
-    <!-- Application Structure Plan: Single-page Quiz application featuring real-time multi-device synchronization via WiFi IP matching and WebSocket message broadcasting. Includes multi-provider IP detection, fallback MQTT brokers for firewall bypassing, interactive quiz player, anti-cheat detection, full admin suite, and global leaderboard. Responsive layout optimized for mobile viewports without display cropping issues. -->
+    <!-- Application Structure Plan: Single-page Quiz application featuring real-time multi-device synchronization via WiFi IP matching and WebSocket message broadcasting. Includes multi-provider IP detection, fallback MQTT brokers for firewall bypassing, interactive quiz player, mid-quiz navigation safeguard warning, anti-cheat detection, full admin suite, automatic percentage grade calculation, and global leaderboard. Responsive layout optimized for mobile viewports without display cropping issues. -->
     <!-- Visualization & Content Choices: Uses HTML/Tailwind dynamic components, Canvas Confetti for rewards, Web Audio API for interactive audio feedback, and MQTT WebSocket network integration. NO SVG graphics or Mermaid JS used. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
@@ -94,7 +94,7 @@
     <header id="main-header" class="bg-quiz-darkPurple border-b border-purple-900/50 sticky top-0 z-30 px-4 py-3 shadow-lg transition-colors duration-300">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <!-- Brand Logo -->
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.navTo('home')">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.requestDrawerNav('home')">
                 <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 p-0.5 shadow-lg overflow-hidden flex items-center justify-center">
                     <img id="app-logo-img" src="https://lh3.googleusercontent.com/d/1L5cfJ9TJxL9DbxAFw1z-XEqeQUWsrYJa" alt="Auraphone Logo" 
                          class="w-full h-full object-cover rounded-xl" 
@@ -108,7 +108,7 @@
             <!-- Header Quick Info / Actions -->
             <div class="flex items-center space-x-3 md:space-x-4">
                 <!-- IP Network Sync Status Badge -->
-                <div id="cloud-status-badge" onclick="app.openSyncModal()" class="cursor-pointer flex items-center space-x-2 bg-purple-950/80 px-3 py-1.5 rounded-full border border-purple-700/50 hover:border-pink-500/50 transition text-xs font-semibold">
+                <div id="cloud-status-badge" onclick="app.requestDrawerNav('sync')" class="cursor-pointer flex items-center space-x-2 bg-purple-950/80 px-3 py-1.5 rounded-full border border-purple-700/50 hover:border-pink-500/50 transition text-xs font-semibold">
                     <i id="cloud-status-icon" class="fa-solid fa-spinner fa-spin text-amber-400"></i>
                     <span id="cloud-status-text" class="text-amber-300">Mendeteksi Internet...</span>
                 </div>
@@ -126,7 +126,7 @@
                     </div>
                 </div>
 
-                <!-- Hamburger Menu Button -->
+                <!-- Hamburger Menu Button (Garis 3) -->
                 <button id="btn-hamburger" onclick="app.toggleDrawer()" class="p-2.5 rounded-xl bg-purple-900/60 hover:bg-purple-800 text-white transition focus:outline-none border border-purple-700/50">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
@@ -152,17 +152,17 @@
 
             <!-- Menu Navigation Items -->
             <nav class="space-y-3">
-                <button onclick="app.navTo('home'); app.toggleDrawer(false);" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 text-gray-200 hover:text-white font-semibold transition border border-purple-700/30">
+                <button onclick="app.requestDrawerNav('home')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 text-gray-200 hover:text-white font-semibold transition border border-purple-700/30">
                     <i class="fa-solid fa-house text-purple-400 w-6"></i>
                     <span>Beranda & Kuis</span>
                 </button>
 
-                <button onclick="app.navTo('leaderboard'); app.toggleDrawer(false);" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 text-gray-200 hover:text-white font-semibold transition border border-purple-700/30">
+                <button onclick="app.requestDrawerNav('leaderboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 text-gray-200 hover:text-white font-semibold transition border border-purple-700/30">
                     <i class="fa-solid fa-trophy text-amber-400 w-6"></i>
                     <span>Papan Skor</span>
                 </button>
 
-                <button onclick="app.openSyncModal(); app.toggleDrawer(false);" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 text-gray-200 hover:text-white font-semibold transition border border-purple-700/30">
+                <button onclick="app.requestDrawerNav('sync')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 text-gray-200 hover:text-white font-semibold transition border border-purple-700/30">
                     <i class="fa-solid fa-network-wired text-cyan-400 w-6"></i>
                     <span>Status Jaringan & Sync</span>
                 </button>
@@ -170,7 +170,7 @@
                 <!-- Secret/Protected Admin Menu Button -->
                 <div class="pt-4 border-t border-purple-800/50">
                     <p class="text-xs uppercase font-bold text-purple-400 tracking-wider mb-2 px-1">Area Khusus</p>
-                    <button onclick="app.openAdminModal(); app.toggleDrawer(false);" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gradient-to-r from-pink-900/40 to-purple-900/40 hover:from-pink-800/60 hover:to-purple-800/60 text-pink-200 font-bold transition border border-pink-500/30">
+                    <button onclick="app.requestDrawerNav('admin')" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gradient-to-r from-pink-900/40 to-purple-900/40 hover:from-pink-800/60 hover:to-purple-800/60 text-pink-200 font-bold transition border border-pink-500/30">
                         <div class="flex items-center space-x-3">
                             <i class="fa-solid fa-user-shield text-pink-400 w-6"></i>
                             <span>Web Admin</span>
@@ -306,14 +306,34 @@
                     <p id="result-quiz-title" class="text-purple-300 text-sm">Nama Kuis</p>
                 </div>
 
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-3 gap-3 pt-2">
+                <!-- MAIN GRADE BOX (NILAI AKHIR 0-100 & PERSENTASE) -->
+                <div class="bg-gradient-to-r from-purple-900/90 via-indigo-900/90 to-purple-950 p-6 rounded-3xl border-2 border-pink-500/50 shadow-2xl text-center relative overflow-hidden">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-pink-300 bg-pink-500/20 px-3 py-1 rounded-full border border-pink-500/30">
+                        Hasil Evaluasi Sistem
+                    </span>
+                    <div class="mt-3 flex items-center justify-center space-x-3">
+                        <span class="text-gray-300 font-bold text-lg md:text-xl">Nilai Anda:</span>
+                        <span id="result-grade-display" class="font-fredoka text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-pink-400">
+                            100
+                        </span>
+                        <span class="text-2xl md:text-3xl font-extrabold text-amber-300">/ 100</span>
+                    </div>
+                    <p id="result-grade-summary" class="text-sm font-semibold text-purple-200 mt-2">
+                        Betul 4 dari 4 Soal (100%)
+                    </p>
+                    <div id="result-grade-badge-text" class="mt-3 inline-block px-4 py-1.5 rounded-xl bg-purple-800/80 border border-purple-600 text-xs font-bold text-amber-300">
+                        🏆 Sempurna! Semua jawaban benar!
+                    </div>
+                </div>
+
+                <!-- Detailed Stats Cards -->
+                <div class="grid grid-cols-3 gap-3 pt-1">
                     <div class="bg-purple-950/80 p-4 rounded-2xl border border-purple-800">
-                        <span class="text-xs text-purple-300 font-semibold block mb-1">Total Skor</span>
+                        <span class="text-xs text-purple-300 font-semibold block mb-1">Total Skor Poin</span>
                         <span id="result-score" class="font-fredoka text-2xl md:text-3xl font-bold text-amber-400">0</span>
                     </div>
                     <div class="bg-purple-950/80 p-4 rounded-2xl border border-purple-800">
-                        <span class="text-xs text-purple-300 font-semibold block mb-1">Akurasi</span>
+                        <span class="text-xs text-purple-300 font-semibold block mb-1">Akurasi Soal</span>
                         <span id="result-accuracy" class="font-fredoka text-2xl md:text-3xl font-bold text-green-400">0%</span>
                     </div>
                     <div class="bg-purple-950/80 p-4 rounded-2xl border border-purple-800">
@@ -492,6 +512,31 @@
     <footer class="text-center py-5 text-xs text-purple-300/60 border-t border-purple-900/40 mt-8">
         © Copyright 2026 Auraphone Systems, All Right Reserved.
     </footer>
+
+    <!-- MODAL: MID-QUIZ NAVIGATION CONFIRMATION (SAFEGUARD POP-UP) -->
+    <div id="modal-confirm-abandon" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
+        <div class="bg-quiz-darkPurple border-2 border-pink-500/70 w-full max-w-md rounded-3xl p-6 md:p-8 shadow-2xl text-center space-y-6 my-auto">
+            <div class="w-16 h-16 bg-pink-500/20 text-pink-400 border border-pink-500/40 rounded-2xl flex items-center justify-center mx-auto text-3xl">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            
+            <div class="space-y-2">
+                <h3 class="font-fredoka text-2xl font-bold text-white">Konfirmasi Keluar Kuis</h3>
+                <p class="text-purple-200 text-sm md:text-base font-semibold leading-relaxed bg-purple-950/80 p-4 rounded-2xl border border-purple-800">
+                    Jika anda mengklik iya, maka jawaban dan kuis anda di batalkan. ketuk tidak untuk melanjutkan
+                </p>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button onclick="app.confirmAbandonQuiz()" class="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 font-bold text-white text-base shadow-xl transition active:scale-95">
+                    Iya, Batalkan
+                </button>
+                <button onclick="app.cancelAbandonQuiz()" class="flex-1 py-3.5 rounded-2xl bg-purple-800 hover:bg-purple-700 font-bold text-white text-base transition active:scale-95 border border-purple-600">
+                    Tidak, Lanjutkan
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL: NETWORK / SYNC STATUS & SETTINGS -->
     <div id="modal-network-sync" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
@@ -1136,6 +1181,9 @@
             isAnsweringAllowed: false,
             editingQuizTemp: null,
 
+            // Safeguard & Navigation state
+            pendingNavTarget: null,
+
             // Anti-cheat state
             isAntiCheatActive: false,
             antiCheatCountdownVal: 10,
@@ -1197,7 +1245,7 @@
 
             setupAntiCheatListeners() {
                 const handleExit = () => {
-                    if (this.currentView === 'play' && this.isAnsweringAllowed && !this.isAntiCheatActive) {
+                    if (this.currentView === 'play' && this.isAnsweringAllowed && !this.isAntiCheatActive && !this.pendingNavTarget) {
                         this.triggerAntiCheatWarning();
                     }
                 };
@@ -1239,7 +1287,7 @@
                 // Reset viewport scroll on mobile to avoid layout clipping
                 window.scrollTo({ top: 0, behavior: 'smooth' });
 
-                if (this.settings.useTimer !== false) {
+                if (this.settings.useTimer !== false && this.isAnsweringAllowed) {
                     this.startTimer();
                 }
             },
@@ -1263,6 +1311,58 @@
             closeKickedModal() {
                 document.getElementById('modal-anti-cheat-kicked').classList.add('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            // SAFEGUARD NAVIGATION HANDLER (Mid-Quiz confirmation popup)
+            requestDrawerNav(target) {
+                this.toggleDrawer(false);
+
+                // Check if user is actively playing a quiz
+                if (this.currentView === 'play' && this.currentQuiz) {
+                    this.pendingNavTarget = target;
+                    // Pause current timer temporarily
+                    clearInterval(this.timerInterval);
+                    document.getElementById('modal-confirm-abandon').classList.remove('hidden');
+                } else {
+                    this.executeTargetNav(target);
+                }
+            },
+
+            confirmAbandonQuiz() {
+                // User clicked "Iya" -> Abandon quiz, go home, then trigger requested action
+                clearInterval(this.timerInterval);
+                this.isAnsweringAllowed = false;
+                document.getElementById('modal-confirm-abandon').classList.add('hidden');
+
+                const navTarget = this.pendingNavTarget;
+                this.pendingNavTarget = null;
+                this.currentQuiz = null;
+
+                // Direct user to home first as instructed, then show what they clicked
+                this.navTo('home');
+
+                if (navTarget && navTarget !== 'home') {
+                    setTimeout(() => {
+                        this.executeTargetNav(navTarget);
+                    }, 100);
+                }
+            },
+
+            cancelAbandonQuiz() {
+                // User clicked "Tidak" -> Close modal and resume quiz
+                document.getElementById('modal-confirm-abandon').classList.add('hidden');
+                this.pendingNavTarget = null;
+
+                if (this.currentView === 'play' && this.isAnsweringAllowed && this.settings.useTimer !== false) {
+                    this.startTimer();
+                }
+            },
+
+            executeTargetNav(target) {
+                if (target === 'home') this.navTo('home');
+                else if (target === 'leaderboard') this.navTo('leaderboard');
+                else if (target === 'sync') this.openSyncModal();
+                else if (target === 'admin') this.openAdminModal();
             },
 
             openSyncModal() {
@@ -1392,6 +1492,7 @@
                 this.streak = 0;
                 this.maxStreak = 0;
                 this.correctAnswersCount = 0;
+                this.pendingNavTarget = null;
 
                 this.updateHeaderStats();
                 this.navTo('play');
@@ -1588,11 +1689,33 @@
             showResults() {
                 const total = this.currentQuiz.questions.length;
                 const accuracy = Math.round((this.correctAnswersCount / total) * 100);
+                
+                // Kalkulasi Nilai Otomatis (0 - 100)
+                const gradeVal = Math.round((this.correctAnswersCount / total) * 100);
 
                 document.getElementById('result-quiz-title').innerText = this.currentQuiz.title;
                 document.getElementById('result-score').innerText = this.score;
                 document.getElementById('result-accuracy').innerText = `${accuracy}%`;
                 document.getElementById('result-streak').innerText = `${this.maxStreak}🔥`;
+
+                // Update Pop-out Nilai Akhir
+                document.getElementById('result-grade-display').innerText = gradeVal;
+                document.getElementById('result-grade-summary').innerText = `Betul ${this.correctAnswersCount} dari ${total} Soal (${accuracy}%)`;
+
+                const badgeTextEl = document.getElementById('result-grade-badge-text');
+                if (gradeVal === 100) {
+                    badgeTextEl.innerText = "🏆 Sempurna! Semua jawaban benar (100%)";
+                    badgeTextEl.className = "mt-3 inline-block px-4 py-1.5 rounded-xl bg-green-800/80 border border-green-500 text-xs font-bold text-green-200";
+                } else if (gradeVal >= 75) {
+                    badgeTextEl.innerText = "🌟 Sangat Bagus! Hasil memuaskan";
+                    badgeTextEl.className = "mt-3 inline-block px-4 py-1.5 rounded-xl bg-blue-800/80 border border-blue-500 text-xs font-bold text-blue-200";
+                } else if (gradeVal >= 50) {
+                    badgeTextEl.innerText = "👍 Cukup Baik! Tingkatkan lagi belajarmu";
+                    badgeTextEl.className = "mt-3 inline-block px-4 py-1.5 rounded-xl bg-amber-800/80 border border-amber-500 text-xs font-bold text-amber-200";
+                } else {
+                    badgeTextEl.innerText = "💪 Jangan Menyerah! Coba lagi untuk nilai lebih tinggi";
+                    badgeTextEl.className = "mt-3 inline-block px-4 py-1.5 rounded-xl bg-red-800/80 border border-red-500 text-xs font-bold text-red-200";
+                }
 
                 this.navTo('results');
 
