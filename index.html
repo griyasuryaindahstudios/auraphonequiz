@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auraphone Quiz</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        fredoka: ['Fredoka', 'sans-serif'],
+                    },
+                    colors: {
+                        quiz: {
+                            purple: '#46178f',
+                            darkPurple: '#2d0e5f',
+                            lightPurple: '#8854d0',
+                            red: '#e21b3c',
+                            blue: '#1368ce',
+                            yellow: '#d89e00',
+                            green: '#26890c',
+                            bg: '#0f0a1c'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0f0a1c;
+            color: #ffffff;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+            transition: background-color 0.3s ease;
+        }
+        .quiz-card-hover {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .quiz-card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(136, 84, 208, 0.4);
+        }
+        .btn-option {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .btn-option:active {
+            transform: scale(0.98);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1338;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #46178f;
+            border-radius: 4px;
+        }
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        .anti-cheat-flash {
+            animation: flash-red 0.8s infinite alternate;
+        }
+        @keyframes flash-red {
+            from { background-color: rgba(185, 28, 28, 0.95); }
+            to { background-color: rgba(88, 28, 28, 0.95); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden" id="app-body">
+
+    <!-- Header / Navbar -->
+    <header id="main-header" class="bg-quiz-darkPurple border-b border-purple-900/50 sticky top-0 z-30 px-4 py-3 shadow-lg transition-colors duration-300">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.navTo('home')">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 p-0.5 shadow-lg overflow-hidden flex items-center justify-center">
+                    <img id="app-logo-img" src="https://lh3.googleusercontent.com/d/1L5cfJ9TJxL9DbxAFw1z-XEqeQUWsrYJa" alt="Auraphone Logo" 
+                         class="w-full h-full object-cover rounded-xl" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/100x100/46178f/ffffff?text=AQ'">
+                </div>
+                <span id="app-title-display" class="font-fredoka text-2xl font-bold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-purple-300 via-pink-300 to-white">
+                    Auraphone Quiz
+                </span>
+            </div>
+
+            <!-- Header Quick Info / Actions -->
+            <div class="flex items-center space-x-4">
+                <!-- Score Display in game -->
+                <div id="game-stats-header" class="hidden flex items-center space-x-3 bg-purple-950/80 px-4 py-1.5 rounded-full border border-purple-700/40">
+                    <div class="flex items-center space-x-1 text-yellow-400 font-bold text-sm">
+                        <i class="fa-solid text-amber-400">⚡</i>
+                        <span id="header-score">0</span>
+                    </div>
+                    <div class="h-4 w-[1px] bg-purple-700/50"></div>
+                    <div class="flex items-center space-x-1 text-orange-400 font-bold text-sm">
+                        <i class="fa-solid fa-fire"></i>
+                        <span id="header-streak">0</span>
+                    </div>
+                </div>
+
+                <!-- Hamburger Menu Button (Garis Tiga) -->
+                <button id="btn-hamburger" onclick="app.toggleDrawer()" class="p-2.5 rounded-xl bg-purple-900/60 hover:bg-purple-800 text-white transition focus:outline-none border border-purple-700/50">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Side Drawer Menu (Triggered by Garis Tiga) -->
+    <div id="drawer-backdrop" onclick="app.toggleDrawer(false)" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+    
+    <aside id="drawer-menu" class="fixed top-0 right-0 h-full w-80 bg-quiz-darkPurple border-l border-purple-800/50 z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between p-6 shadow-2xl">
+        <div>
+            <!-- Drawer Header -->
+            <div class="flex items-center justify-between border-b border-purple-800/60 pb-4 mb-6">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-compass text-pink-400"></i>
+                    <h3 class="font-fredoka text-xl font-bold text-white">Menu Utama</h3>
+                </div>
+                <button onclick="app.toggleDrawer(false)" class="text-gray-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Menu Navigation Items -->
+            <nav class="space-y-3">
+                <button onclick="app.navTo('home'); app.toggleDrawer(false);" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 text-gray-200 hover:text-white font-semibold transition border border-purple-700/30">
+                    <i class="fa-solid fa-house text-purple-400 w-6"></i>
+                    <span>Beranda & Kuis</span>
+                </button>
+
+                <button onclick="app.navTo('leaderboard'); app.toggleDrawer(false);" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 text-gray-200 hover:text-white font-semibold transition border border-purple-700/30">
+                    <i class="fa-solid fa-trophy text-amber-400 w-6"></i>
+                    <span>Papan Skor</span>
+                </button>
+
+                <!-- Secret/Protected Admin Menu Button -->
+                <div class="pt-4 border-t border-purple-800/50">
+                    <p class="text-xs uppercase font-bold text-purple-400 tracking-wider mb-2 px-1">Area Khusus</p>
+                    <button onclick="app.openAdminModal(); app.toggleDrawer(false);" class="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gradient-to-r from-pink-900/40 to-purple-900/40 hover:from-pink-800/60 hover:to-purple-800/60 text-pink-200 font-bold transition border border-pink-500/30">
+                        <div class="flex items-center space-x-3">
+                            <i class="fa-solid fa-user-shield text-pink-400 w-6"></i>
+                            <span>Web Admin</span>
+                        </div>
+                        <i class="fa-solid fa-lock text-xs text-pink-300"></i>
+                    </button>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Drawer Footer -->
+        <div class="text-center border-t border-purple-800/50 pt-4">
+            <p class="text-xs text-purple-300/80 font-semibold">© Copyright 2026 Auraphone Systems, All Right Reserved.</p>
+        </div>
+    </aside>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6">
+
+        <!-- VIEW 1: HOME / QUIZ LIBRARY -->
+        <section id="view-home" class="space-y-8">
+            <!-- Hero Banner & Join Code -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 p-6 md:p-10 border border-purple-700/40 shadow-2xl">
+                <div class="relative z-10 max-w-2xl">
+                    <span class="bg-pink-500/20 text-pink-300 text-xs font-bold px-3 py-1 rounded-full border border-pink-500/30 inline-block mb-3">
+                        ⚡ Quizizz Interactive Platform
+                    </span>
+                    <h1 id="welcome-message" class="font-fredoka text-3xl md:text-5xl font-bold mb-4 text-white leading-tight">
+                        Asah Pengetahuanmu Sekarang!
+                    </h1>
+                    <p class="text-purple-200 text-sm md:text-base mb-6">
+                        Pilih kuis interaktif di bawah atau masukkan Kode PIN kuis dari gurumu.
+                    </p>
+
+                    <!-- Join PIN Form -->
+                    <div class="flex flex-col sm:flex-row gap-2 max-w-md">
+                        <input type="text" id="join-pin-input" placeholder="Masukkan Kode Kuis (mis. 1234)" 
+                            class="flex-1 px-5 py-3.5 rounded-2xl bg-purple-950/80 border-2 border-purple-500/50 text-white placeholder-purple-400/70 font-semibold focus:outline-none focus:border-pink-500 transition text-center sm:text-left">
+                        <button onclick="app.joinByPin()" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white shadow-lg transition transform active:scale-95 flex items-center justify-center space-x-2">
+                            <span>Mulai</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Decorative Graphic -->
+                <div class="absolute -right-10 -bottom-10 opacity-20 md:opacity-30 pointer-events-none">
+                    <i class="fa-solid fa-gamepad text-[220px] text-purple-400"></i>
+                </div>
+            </div>
+
+            <!-- Quiz Selection Grid -->
+            <div>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-fredoka text-2xl font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-fire-flame-curved text-amber-400"></i>
+                        <span>Daftar Kuis Tersedia</span>
+                    </h2>
+                    <span id="quiz-count-badge" class="text-xs font-semibold bg-purple-900/60 border border-purple-700 px-3 py-1 rounded-full text-purple-300">
+                        0 Kuis
+                    </span>
+                </div>
+
+                <div id="quiz-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Quiz Cards Will Be Injected JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: QUIZ GAMEPLAY -->
+        <section id="view-play" class="hidden max-w-4xl mx-auto space-y-6">
+            <!-- Game Top Info Bar -->
+            <div id="game-info-bar" class="card-element bg-quiz-darkPurple p-4 rounded-2xl border border-purple-800/60 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+                <!-- Progress Indicator -->
+                <div class="flex items-center space-x-3">
+                    <span id="question-progress-text" class="text-sm font-bold text-purple-300">Soal 1/10</span>
+                    <div class="w-32 md:w-48 bg-purple-950 h-3 rounded-full overflow-hidden border border-purple-800">
+                        <div id="question-progress-bar" class="bg-gradient-to-r from-pink-500 to-purple-500 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <!-- Timer Bar -->
+                <div id="game-timer-container" class="flex items-center space-x-2 bg-purple-950/80 px-4 py-2 rounded-xl border border-purple-700/50">
+                    <i class="fa-solid fa-clock text-amber-400" id="timer-icon"></i>
+                    <span id="timer-text" class="font-fredoka text-lg font-bold text-amber-300">20s</span>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div id="question-card" class="card-element bg-gradient-to-b from-purple-900/90 to-quiz-darkPurple p-6 md:p-8 rounded-3xl border border-purple-700/50 shadow-2xl relative overflow-hidden min-h-[200px] flex flex-col justify-center items-center text-center">
+                <!-- Point value badge -->
+                <span id="question-points-badge" class="absolute top-4 right-4 bg-purple-800/80 border border-purple-600 text-purple-200 text-xs font-bold px-3 py-1 rounded-full">
+                    +1000 Poin max
+                </span>
+
+                <!-- Question Text -->
+                <h2 id="question-text" class="font-fredoka text-xl md:text-3xl font-bold text-white leading-relaxed mt-2">
+                    Loading soal...
+                </h2>
+
+                <!-- Question Optional Image / Graphic Placeholder -->
+                <div id="question-image-container" class="mt-4 hidden">
+                    <img id="question-image" src="" alt="Soal Media" class="max-h-48 rounded-xl border border-purple-600/50 object-contain mx-auto shadow-md">
+                </div>
+            </div>
+
+            <!-- Answer Options Grid (4 Quizizz Colors) -->
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Option buttons generated via JS -->
+            </div>
+
+            <!-- Feedback Overlay (Shows when answered) -->
+            <div id="answer-feedback-banner" class="hidden p-4 rounded-2xl text-center font-bold text-xl transition-all duration-300 animate-bounce">
+                <span id="feedback-message">Jawaban Benar!</span>
+            </div>
+        </section>
+
+        <!-- VIEW 3: RESULTS SUMMARY -->
+        <section id="view-results" class="hidden max-w-2xl mx-auto text-center space-y-6">
+            <div class="bg-quiz-darkPurple border border-purple-700/60 p-8 rounded-3xl shadow-2xl space-y-6 relative overflow-hidden">
+                <!-- Confetti Anchor Header -->
+                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-400 to-yellow-300 text-purple-950 flex items-center justify-center text-4xl shadow-xl font-fredoka">
+                    🏆
+                </div>
+
+                <div>
+                    <h2 class="font-fredoka text-3xl md:text-4xl font-bold text-white mb-1">Kuis Selesai!</h2>
+                    <p id="result-quiz-title" class="text-purple-300 text-sm">Nama Kuis</p>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-3 gap-3 pt-2">
+                    <div class="bg-purple-950/80 p-4 rounded-2xl border border-purple-800">
+                        <span class="text-xs text-purple-300 font-semibold block mb-1">Total Skor</span>
+                        <span id="result-score" class="font-fredoka text-2xl md:text-3xl font-bold text-amber-400">0</span>
+                    </div>
+                    <div class="bg-purple-950/80 p-4 rounded-2xl border border-purple-800">
+                        <span class="text-xs text-purple-300 font-semibold block mb-1">Akurasi</span>
+                        <span id="result-accuracy" class="font-fredoka text-2xl md:text-3xl font-bold text-green-400">0%</span>
+                    </div>
+                    <div class="bg-purple-950/80 p-4 rounded-2xl border border-purple-800">
+                        <span class="text-xs text-purple-300 font-semibold block mb-1">Streak Terbaik</span>
+                        <span id="result-streak" class="font-fredoka text-2xl md:text-3xl font-bold text-orange-400">0</span>
+                    </div>
+                </div>
+
+                <!-- Player Name Input for Leaderboard -->
+                <div id="save-score-box" class="bg-purple-900/40 p-4 rounded-2xl border border-purple-700/50 space-y-3">
+                    <label class="block text-sm text-purple-200 font-semibold">Simpan Skor ke Papan Peringkat:</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="player-name-input" placeholder="Nama Kamu..." maxlength="15"
+                            class="flex-1 px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white placeholder-purple-400 text-sm focus:outline-none focus:border-pink-500">
+                        <button onclick="app.saveScoreToLeaderboard()" class="px-5 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 font-bold text-white text-sm transition">
+                            Simpan
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3 pt-4">
+                    <button onclick="app.restartCurrentQuiz()" class="flex-1 py-3 px-4 rounded-xl bg-purple-800 hover:bg-purple-700 text-white font-bold transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Coba Lagi</span>
+                    </button>
+                    <button onclick="app.navTo('home')" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Menu Utama</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: LEADERBOARD -->
+        <section id="view-leaderboard" class="hidden max-w-3xl mx-auto space-y-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="font-fredoka text-3xl font-bold text-white flex items-center space-x-3">
+                        <i class="fa-solid fa-trophy text-amber-400"></i>
+                        <span>Papan Peringkat Global</span>
+                    </h2>
+                    <p class="text-purple-300 text-sm">Pemain teratas dari seluruh kuis</p>
+                </div>
+                <button onclick="app.clearLeaderboard()" class="text-xs bg-red-950/60 hover:bg-red-900 border border-red-800/80 text-red-300 px-3 py-1.5 rounded-lg transition">
+                    <i class="fa-solid fa-trash mr-1"></i> Reset Skor
+                </button>
+            </div>
+
+            <div class="bg-quiz-darkPurple border border-purple-800/60 rounded-3xl p-4 md:p-6 shadow-xl">
+                <div id="leaderboard-list" class="space-y-2">
+                    <!-- Leaderboard items JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- MODAL: ADMIN PASSWORD PROMPT -->
+        <div id="modal-admin-auth" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl relative animate-scale-up">
+                <button onclick="app.closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+
+                <div class="text-center space-y-3 mb-6">
+                    <div class="w-16 h-16 bg-pink-500/20 text-pink-400 border border-pink-500/40 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <h3 class="font-fredoka text-2xl font-bold text-white">Otentikasi Web Admin</h3>
+                    <p class="text-purple-300 text-sm">Masukkan password rahasia untuk mengubah soal & tampilan.</p>
+                </div>
+
+                <form onsubmit="app.verifyAdminPassword(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-purple-300 mb-1">Password Admin</label>
+                        <div class="relative">
+                            <input type="password" id="admin-password-input" placeholder="••••••" 
+                                class="w-full px-4 py-3 rounded-xl bg-purple-950 border-2 border-purple-700 text-white text-center tracking-widest text-lg focus:outline-none focus:border-pink-500">
+                        </div>
+                        <p id="admin-auth-error" class="text-red-400 text-xs font-semibold mt-1 hidden text-center">
+                            Password salah! Coba lagi.
+                        </p>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white shadow-lg transition">
+                        Masuk Panel Admin
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- MODAL: EDIT / CREATE QUIZ -->
+        <div id="modal-edit-quiz" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
+            <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-2xl rounded-3xl p-6 md:p-8 shadow-2xl relative my-8 max-h-[90vh] flex flex-col">
+                <button onclick="app.closeEditQuizModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+
+                <h3 class="font-fredoka text-2xl font-bold text-white mb-4 flex items-center space-x-2">
+                    <i class="fa-solid fa-pen-to-square text-pink-400"></i>
+                    <span>Editor Kuis & Soal</span>
+                </h3>
+
+                <div class="space-y-4 overflow-y-auto pr-2 flex-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-bold text-purple-300 uppercase mb-1">Judul Kuis</label>
+                            <input type="text" id="edit-quiz-title" placeholder="Nama Kuis..." class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-purple-300 uppercase mb-1">PIN Kuis</label>
+                            <input type="text" id="edit-quiz-pin" placeholder="1234" class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-purple-300 uppercase mb-1">Deskripsi Ringkas</label>
+                        <input type="text" id="edit-quiz-desc" placeholder="Deskripsi singkat kuis..." class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
+                    </div>
+
+                    <div class="border-t border-purple-800/80 pt-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-fredoka text-lg font-bold text-pink-300">Daftar Pertanyaan</h4>
+                            <button onclick="app.addNewQuestionToEditingQuiz()" class="px-3 py-1.5 rounded-xl bg-purple-800 hover:bg-purple-700 text-xs font-bold text-white transition flex items-center space-x-1">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Tambah Soal</span>
+                            </button>
+                        </div>
+
+                        <div id="modal-questions-editor-list" class="space-y-4">
+                            <!-- Dynamic Question Inputs JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 mt-2 border-t border-purple-800/80 flex gap-3">
+                    <button onclick="app.saveEditingQuiz()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white shadow-lg transition">
+                        Simpan Kuis
+                    </button>
+                    <button onclick="app.closeEditQuizModal()" class="px-5 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-sm transition">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 5: ADMIN PANEL -->
+        <section id="view-admin" class="hidden space-y-8">
+            <!-- Admin Top Header -->
+            <div class="bg-gradient-to-r from-pink-950/80 via-purple-900/80 to-quiz-darkPurple border border-pink-500/30 p-6 rounded-3xl flex flex-wrap justify-between items-center gap-4 shadow-2xl">
+                <div>
+                    <span class="bg-pink-500/20 text-pink-300 text-xs font-bold px-3 py-1 rounded-full border border-pink-500/30">
+                        <i class="fa-solid fa-shield-halved mr-1"></i> Admin Dashboard
+                    </span>
+                    <h2 class="font-fredoka text-3xl font-bold text-white mt-1">Pengaturan Web & Kelola Soal</h2>
+                </div>
+                <button onclick="app.logoutAdmin()" class="px-4 py-2 bg-red-950 border border-red-700 text-red-200 hover:bg-red-900 rounded-xl font-semibold text-sm transition flex items-center space-x-2">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Keluar Admin</span>
+                </button>
+            </div>
+
+            <!-- Admin Navigation Tabs -->
+            <div class="flex border-b border-purple-800 space-x-2">
+                <button id="admin-tab-quizzes" onclick="app.switchAdminTab('quizzes')" class="px-5 py-3 font-fredoka text-lg font-bold border-b-2 border-pink-500 text-pink-400">
+                    <i class="fa-solid fa-layer-group mr-2"></i>Kelola Kuis
+                </button>
+                <button id="admin-tab-appearance" onclick="app.switchAdminTab('appearance')" class="px-5 py-3 font-fredoka text-lg font-bold text-purple-400 hover:text-purple-200">
+                    <i class="fa-solid fa-palette mr-2"></i>Ubah Tampilan Web
+                </button>
+            </div>
+
+            <!-- TAB 1: KELOLA KUIS -->
+            <div id="admin-content-quizzes" class="space-y-6">
+                <!-- Action Bar -->
+                <div class="flex justify-between items-center">
+                    <h3 class="font-fredoka text-xl font-bold text-purple-200">Daftar Kuis Saat Ini</h3>
+                    <button onclick="app.openCreateQuizModal()" class="px-4 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 font-bold text-white text-sm transition flex items-center space-x-2 shadow-lg">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Buat Kuis Baru</span>
+                    </button>
+                </div>
+
+                <!-- Admin Quizzes List -->
+                <div id="admin-quizzes-list" class="space-y-4">
+                    <!-- Dynamic List via JS -->
+                </div>
+            </div>
+
+            <!-- TAB 2: UBAH TAMPILAN WEB -->
+            <div id="admin-content-appearance" class="hidden card-element bg-quiz-darkPurple border border-purple-800/60 p-6 md:p-8 rounded-3xl space-y-6">
+                <h3 class="font-fredoka text-2xl font-bold text-white mb-4">Pengaturan Tampilan & Sistem</h3>
+
+                <form onsubmit="app.saveAppearanceSettings(event)" class="space-y-5 max-w-2xl">
+                    <div>
+                        <label class="block text-sm font-bold text-purple-300 mb-1">Judul Aplikasi (Header)</label>
+                        <input type="text" id="setting-app-title" class="w-full px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white focus:outline-none focus:border-pink-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-purple-300 mb-1">Teks Banner Selamat Datang</label>
+                        <textarea id="setting-welcome-msg" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white focus:outline-none focus:border-pink-500"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-bold text-purple-300 mb-1">Warna Background Utama</label>
+                            <select id="setting-theme-bg" class="w-full px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white focus:outline-none focus:border-pink-500">
+                                <option value="#0f0a1c">Ungu Gelap (Quizizz Standard)</option>
+                                <option value="#090d16">Biru Midnight</option>
+                                <option value="#180a0a">Merah Cyber</option>
+                                <option value="#051811">Hijau Emerald</option>
+                                <option value="#0f172a">Slate Charcoal</option>
+                                <option value="#1e1b4b">Deep Indigo</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-purple-300 mb-1">Warna Elemen Kotak/Card</label>
+                            <select id="setting-card-bg" class="w-full px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white focus:outline-none focus:border-pink-500">
+                                <option value="#1e1338">Ungu Deep</option>
+                                <option value="#0d1b2a">Biru Navy</option>
+                                <option value="#2b0909">Merah Gelap</option>
+                                <option value="#062e21">Hijau Dark Emerald</option>
+                                <option value="#1e293b">Slate Blue-Gray</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex items-center justify-between p-4 bg-purple-950/60 rounded-xl border border-purple-800">
+                            <div>
+                                <span class="font-bold text-white text-sm block">Timer Per Soal</span>
+                                <span class="text-xs text-purple-300">Aktifkan penghitung waktu kuis</span>
+                            </div>
+                            <input type="checkbox" id="setting-use-timer" class="w-5 h-5 accent-pink-500 cursor-pointer">
+                        </div>
+                        <div class="p-4 bg-purple-950/60 rounded-xl border border-purple-800">
+                            <label class="font-bold text-white text-sm block mb-1">Timer Peringatan Keluar Tab (Detik)</label>
+                            <input type="number" id="setting-anti-cheat-timer" min="5" max="60" class="w-full px-3 py-1.5 rounded-lg bg-purple-900 border border-purple-700 text-white text-sm focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between p-4 bg-purple-950/60 rounded-xl border border-purple-800">
+                        <div>
+                            <span class="font-bold text-white text-sm block">Efek Suara (Audio Feedback)</span>
+                            <span class="text-xs text-purple-300">Mainkan nada saat memilih jawaban benar/salah & alarm anti-cheat</span>
+                        </div>
+                        <input type="checkbox" id="setting-sound-enabled" class="w-5 h-5 accent-pink-500 cursor-pointer">
+                    </div>
+
+                    <div class="pt-4 flex gap-3">
+                        <button type="submit" class="px-6 py-3 rounded-xl bg-pink-600 hover:bg-pink-700 font-bold text-white shadow-lg transition">
+                            Simpan Perubahan
+                        </button>
+                        <button type="button" onclick="app.resetSystemData()" class="px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-sm transition">
+                            Reset ke Data Bawaan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER COPYRIGHT -->
+    <footer class="text-center py-5 text-xs text-purple-300/60 border-t border-purple-900/40 mt-8">
+        © Copyright 2026 Auraphone Systems, All Right Reserved.
+    </footer>
+
+    <!-- MODAL: ANTI-CHEAT / ANTI-AI WARNING -->
+    <div id="modal-anti-cheat-warning" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden anti-cheat-flash">
+        <div class="bg-red-950 border-2 border-red-500 w-full max-w-lg rounded-3xl p-6 md:p-8 shadow-2xl text-center space-y-6">
+            <div class="w-20 h-20 bg-red-600 text-white rounded-full flex items-center justify-center mx-auto text-4xl shadow-xl animate-bounce">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <h3 class="font-fredoka text-2xl font-bold text-white mb-2">PERINGATAN SISTEM ANTI-CURANG!</h3>
+                <p class="text-red-200 text-sm md:text-base leading-relaxed bg-red-900/60 p-4 rounded-2xl border border-red-700 font-semibold">
+                    Anda terdeteksi keluar dari web, konsekuensinya, ketika anda keluar dari Web ini, jawaban dan soal anda akan hangus. ketuk Kembali untuk Melanjutkan pertanyaan sebelum timer habis
+                </p>
+            </div>
+            
+            <div class="bg-red-900/80 border border-red-600 p-3 rounded-xl inline-block">
+                <span class="text-xs text-red-300 block">Sisa Waktu Menjawab Sebelum Hangus:</span>
+                <span id="anti-cheat-countdown" class="font-fredoka text-3xl font-bold text-yellow-300">10s</span>
+            </div>
+
+            <button onclick="app.dismissAntiCheatWarning()" class="w-full py-3.5 rounded-2xl bg-yellow-400 hover:bg-yellow-300 text-red-950 font-black text-lg shadow-xl transition transform active:scale-95 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Kembali</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: KICKED / EXITED POP-UP -->
+    <div id="modal-anti-cheat-kicked" class="fixed inset-0 bg-black/90 backdrop-blur-lg z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-quiz-darkPurple border-2 border-red-600 w-full max-w-md rounded-3xl p-6 shadow-2xl text-center space-y-5">
+            <div class="w-16 h-16 bg-red-600/30 border border-red-500 text-red-400 rounded-2xl flex items-center justify-center mx-auto text-3xl">
+                <i class="fa-solid fa-ban"></i>
+            </div>
+            <h3 class="font-fredoka text-2xl font-bold text-white">Kuis Dibatalkan</h3>
+            <p id="kicked-message-text" class="text-purple-200 text-sm leading-relaxed bg-purple-950 p-4 rounded-2xl border border-purple-800">
+                Anda telah Keluar dari Kuis silakan untuk mulai ulang dari awal
+            </p>
+            <button onclick="app.closeKickedModal()" class="w-full py-3 rounded-xl bg-purple-700 hover:bg-purple-600 font-bold text-white transition">
+                Mengerti & Kembali
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION POPUP -->
+    <div id="toast-notification" class="fixed bottom-6 right-6 z-50 flex items-center space-x-3 bg-purple-900 border border-pink-500/50 text-white px-5 py-3.5 rounded-2xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-pink-400 text-xl"></i>
+        <span id="toast-message" class="text-sm font-semibold">Notifikasi</span>
+    </div>
+
+    <!-- Firebase Standard ESM Module imports for real-time synchronization -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'auraphone-quiz-default';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "dummy-key",
+            authDomain: "dummy.firebaseapp.com",
+            projectId: "dummy-project",
+            storageBucket: "dummy.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:dummy"
+        };
+
+        try {
+            const firebaseApp = initializeApp(firebaseConfig);
+            const auth = getAuth(firebaseApp);
+            const db = getFirestore(firebaseApp);
+
+            window.cloudSync = {
+                enabled: true,
+                db,
+                auth,
+                async initAuth() {
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (e) {
+                        console.warn("Firebase Auth fallback silently:", e);
+                    }
+                },
+                listenData(key, callback) {
+                    if (!auth.currentUser) return;
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_state', key);
+                    return onSnapshot(docRef, (snapshot) => {
+                        if (snapshot.exists()) {
+                            callback(snapshot.data().payload);
+                        }
+                    }, (err) => console.warn("Firestore snapshot error:", err));
+                },
+                async saveData(key, data) {
+                    if (!auth.currentUser) return;
+                    try {
+                        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'app_state', key);
+                        await setDoc(docRef, { payload: data, updatedAt: new Date().toISOString() });
+                    } catch (e) {
+                        console.warn("Firestore save error:", e);
+                    }
+                }
+            };
+        } catch (err) {
+            console.warn("Firebase initialized in local-only fallback mode:", err);
+            window.cloudSync = { enabled: false };
+        }
+    </script>
+
+    <!-- JAVASCRIPT APP ENGINE -->
+    <script>
+        const DEFAULT_QUIZZES = [
+            {
+                id: 'q1',
+                title: 'Pengetahuan Umum & Sains',
+                pin: '1234',
+                description: 'Uji wawasan dasar Sains dan Pengetahuan Umum!',
+                questions: [
+                    {
+                        type: 'multiple_choice',
+                        question: 'Planet apakah yang dikenal sebagai Planet Merah?',
+                        options: ['Venus', 'Mars', 'Jupiter', 'Saturnus'],
+                        correctIndex: 1,
+                        timeLimit: 15
+                    },
+                    {
+                        type: 'essay',
+                        question: 'Jelaskan secara singkat apa yang dimaksud dengan fotosintesis pada tumbuhan!',
+                        sampleAnswer: 'Proses pembuatan makanan oleh tumbuhan dengan bantuan sinar matahari',
+                        timeLimit: 30
+                    },
+                    {
+                        type: 'multiple_choice',
+                        question: 'Proses pembuatan makanan pada tumbuhan hijau dinamakan...',
+                        options: ['Respirasi', 'Fotosintesis', 'Transpirasi', 'Evaporasi'],
+                        correctIndex: 1,
+                        timeLimit: 15
+                    },
+                    {
+                        type: 'multiple_choice',
+                        question: 'Berapakah hasil dari 12 x 8 ?',
+                        options: ['86', '92', '96', '104'],
+                        correctIndex: 2,
+                        timeLimit: 15
+                    }
+                ]
+            },
+            {
+                id: 'q2',
+                title: 'Kuis Sejarah Indonesia',
+                pin: '5678',
+                description: 'Uji pengetahuanmu tentang sejarah kemerdekaan RI!',
+                questions: [
+                    {
+                        type: 'multiple_choice',
+                        question: 'Tahun berapakah Indonesia memproklamasikan kemerdekaan?',
+                        options: ['1942', '1945', '1950', '1928'],
+                        correctIndex: 1,
+                        timeLimit: 20
+                    },
+                    {
+                        type: 'essay',
+                        question: 'Sebutkan nama tokoh proklamator kemerdekaan Republik Indonesia!',
+                        sampleAnswer: 'Soekarno dan Mohammad Hatta',
+                        timeLimit: 30
+                    },
+                    {
+                        type: 'multiple_choice',
+                        question: 'Siapakah nama Wakil Presiden Indonesia yang pertama?',
+                        options: ['Mohammad Hatta', 'Soepomo', 'Sutan Sjahrir', 'Tan Malaka'],
+                        correctIndex: 0,
+                        timeLimit: 20
+                    }
+                ]
+            }
+        ];
+
+        // Sound Synthesis (Web Audio API)
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.alarmOsc = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            playCorrect() {
+                if (!app.settings.soundEnabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, this.ctx.currentTime); // C5
+                osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.3); // A5
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.3);
+            }
+
+            playWrong() {
+                if (!app.settings.soundEnabled) return;
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, this.ctx.currentTime); // A3
+                osc.frequency.exponentialRampToValueAtTime(110, this.ctx.currentTime + 0.3); // A2
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.3);
+            }
+
+            startAlarm() {
+                if (!app.settings.soundEnabled) return;
+                this.init();
+                if (this.alarmOsc) return;
+                this.alarmOsc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                this.alarmOsc.type = 'sawtooth';
+                this.alarmOsc.frequency.setValueAtTime(880, this.ctx.currentTime);
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                this.alarmOsc.connect(gain);
+                gain.connect(this.ctx.destination);
+                this.alarmOsc.start();
+            }
+
+            stopAlarm() {
+                if (this.alarmOsc) {
+                    try { this.alarmOsc.stop(); } catch(e){}
+                    this.alarmOsc = null;
+                }
+            }
+        }
+
+        const soundFX = new SoundFX();
+
+        // MAIN APP APPLICATION OBJECT
+        const app = {
+            adminPassword: "060312", // Password admin requested by user
+            isAdminLoggedIn: false,
+            quizzes: [],
+            leaderboard: [],
+            settings: {
+                title: 'Auraphone Quiz',
+                welcomeMsg: 'Asah Pengetahuanmu Sekarang!',
+                themeBg: '#0f0a1c',
+                cardBg: '#1e1338',
+                soundEnabled: true,
+                useTimer: true,
+                antiCheatTimer: 10
+            },
+            
+            // Gameplay state
+            currentView: 'home',
+            currentQuiz: null,
+            currentQuestionIdx: 0,
+            score: 0,
+            streak: 0,
+            maxStreak: 0,
+            correctAnswersCount: 0,
+            timerInterval: null,
+            timeLeft: 0,
+            isAnsweringAllowed: false,
+            editingQuizTemp: null,
+
+            // Anti-cheat state
+            isAntiCheatActive: false,
+            antiCheatCountdownVal: 10,
+            antiCheatInterval: null,
+
+            init() {
+                this.loadFromStorage();
+                this.applySettings();
+                this.renderHomeQuizzes();
+                this.renderLeaderboard();
+                this.setupAntiCheatListeners();
+                this.initCloudSync();
+            },
+
+            async initCloudSync() {
+                if (window.cloudSync && window.cloudSync.initAuth) {
+                    await window.cloudSync.initAuth();
+                    window.cloudSync.listenData('quizzes', (data) => {
+                        if (data) { this.quizzes = data; this.renderHomeQuizzes(); if(this.currentView === 'admin') this.renderAdminDashboard(); }
+                    });
+                    window.cloudSync.listenData('settings', (data) => {
+                        if (data) { this.settings = data; this.applySettings(); }
+                    });
+                    window.cloudSync.listenData('leaderboard', (data) => {
+                        if (data) { this.leaderboard = data; this.renderLeaderboard(); }
+                    });
+                }
+            },
+
+            loadFromStorage() {
+                const savedQuizzes = localStorage.getItem('quizizz_quizzes');
+                this.quizzes = savedQuizzes ? JSON.parse(savedQuizzes) : DEFAULT_QUIZZES;
+
+                const savedSettings = localStorage.getItem('quizizz_settings');
+                if (savedSettings) this.settings = JSON.parse(savedSettings);
+
+                const savedLeaderboard = localStorage.getItem('quizizz_leaderboard');
+                this.leaderboard = savedLeaderboard ? JSON.parse(savedLeaderboard) : [
+                    { name: 'Budi Super', score: 2800, quizTitle: 'Pengetahuan Umum & Sains', date: '10/09/2026' },
+                    { name: 'Siti Pintar', score: 2400, quizTitle: 'Sejarah Indonesia', date: '09/09/2026' }
+                ];
+            },
+
+            saveStorage() {
+                localStorage.setItem('quizizz_quizzes', JSON.stringify(this.quizzes));
+                localStorage.setItem('quizizz_settings', JSON.stringify(this.settings));
+                localStorage.setItem('quizizz_leaderboard', JSON.stringify(this.leaderboard));
+
+                if (window.cloudSync && window.cloudSync.saveData) {
+                    window.cloudSync.saveData('quizzes', this.quizzes);
+                    window.cloudSync.saveData('settings', this.settings);
+                    window.cloudSync.saveData('leaderboard', this.leaderboard);
+                }
+            },
+
+            applySettings() {
+                document.getElementById('app-title-display').innerText = this.settings.title || 'Auraphone Quiz';
+                document.getElementById('welcome-message').innerText = this.settings.welcomeMsg || 'Asah Pengetahuanmu Sekarang!';
+                document.body.style.backgroundColor = this.settings.themeBg || '#0f0a1c';
+                
+                // Update card colors
+                const cards = document.querySelectorAll('.card-element, .quiz-card-hover');
+                cards.forEach(card => {
+                    card.style.backgroundColor = this.settings.cardBg || '#1e1338';
+                });
+
+                document.getElementById('setting-app-title').value = this.settings.title || 'Auraphone Quiz';
+                document.getElementById('setting-welcome-msg').value = this.settings.welcomeMsg || '';
+                document.getElementById('setting-theme-bg').value = this.settings.themeBg || '#0f0a1c';
+                document.getElementById('setting-card-bg').value = this.settings.cardBg || '#1e1338';
+                document.getElementById('setting-sound-enabled').checked = !!this.settings.soundEnabled;
+                document.getElementById('setting-use-timer').checked = this.settings.useTimer !== false;
+                document.getElementById('setting-anti-cheat-timer').value = this.settings.antiCheatTimer || 10;
+            },
+
+            setupAntiCheatListeners() {
+                const handleExit = () => {
+                    if (this.currentView === 'play' && this.isAnsweringAllowed && !this.isAntiCheatActive) {
+                        this.triggerAntiCheatWarning();
+                    }
+                };
+
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) handleExit();
+                });
+
+                window.addEventListener('blur', () => {
+                    handleExit();
+                });
+            },
+
+            triggerAntiCheatWarning() {
+                this.isAntiCheatActive = true;
+                clearInterval(this.timerInterval); // Pause question timer
+                soundFX.startAlarm();
+
+                this.antiCheatCountdownVal = parseInt(this.settings.antiCheatTimer) || 10;
+                document.getElementById('anti-cheat-countdown').innerText = `${this.antiCheatCountdownVal}s`;
+                document.getElementById('modal-anti-cheat-warning').classList.remove('hidden');
+
+                this.antiCheatInterval = setInterval(() => {
+                    this.antiCheatCountdownVal--;
+                    document.getElementById('anti-cheat-countdown').innerText = `${this.antiCheatCountdownVal}s`;
+
+                    if (this.antiCheatCountdownVal <= 0) {
+                        this.kickPlayerFromQuiz();
+                    }
+                }, 1000);
+            },
+
+            dismissAntiCheatWarning() {
+                clearInterval(this.antiCheatInterval);
+                soundFX.stopAlarm();
+                document.getElementById('modal-anti-cheat-warning').classList.add('hidden');
+                this.isAntiCheatActive = false;
+
+                // Resume question timer
+                if (this.settings.useTimer !== false) {
+                    this.startTimer();
+                }
+            },
+
+            kickPlayerFromQuiz() {
+                clearInterval(this.antiCheatInterval);
+                clearInterval(this.timerInterval);
+                soundFX.stopAlarm();
+
+                document.getElementById('modal-anti-cheat-warning').classList.add('hidden');
+                this.isAntiCheatActive = false;
+
+                const quizName = this.currentQuiz ? this.currentQuiz.title : 'Kuis';
+                document.getElementById('kicked-message-text').innerText = 
+                    `Anda telah Keluar dari Kuis (${quizName}) silakan untuk mulai ulang dari awal`;
+
+                this.navTo('home');
+                document.getElementById('modal-anti-cheat-kicked').classList.remove('hidden');
+            },
+
+            closeKickedModal() {
+                document.getElementById('modal-anti-cheat-kicked').classList.add('hidden');
+            },
+
+            navTo(viewId) {
+                this.currentView = viewId;
+                const views = ['home', 'play', 'results', 'leaderboard', 'admin'];
+                views.forEach(v => {
+                    const el = document.getElementById(`view-${v}`);
+                    if (el) el.classList.add('hidden');
+                });
+
+                const target = document.getElementById(`view-${viewId}`);
+                if (target) target.classList.remove('hidden');
+
+                // Header stats visibility
+                const statsHeader = document.getElementById('game-stats-header');
+                if (viewId === 'play') {
+                    statsHeader.classList.remove('hidden');
+                } else {
+                    statsHeader.classList.add('hidden');
+                }
+
+                if (viewId === 'home') this.renderHomeQuizzes();
+                if (viewId === 'leaderboard') this.renderLeaderboard();
+                if (viewId === 'admin') this.renderAdminDashboard();
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            toggleDrawer(show) {
+                const drawer = document.getElementById('drawer-menu');
+                const backdrop = document.getElementById('drawer-backdrop');
+                const isHidden = drawer.classList.contains('translate-x-full');
+                
+                const shouldOpen = show !== undefined ? show : isHidden;
+
+                if (shouldOpen) {
+                    drawer.classList.remove('translate-x-full');
+                    backdrop.classList.remove('hidden');
+                } else {
+                    drawer.classList.add('translate-x-full');
+                    backdrop.classList.add('hidden');
+                }
+            },
+
+            showToast(msg, icon = 'fa-circle-check') {
+                const toast = document.getElementById('toast-notification');
+                document.getElementById('toast-message').innerText = msg;
+                document.getElementById('toast-icon').className = `fa-solid ${icon}`;
+                
+                toast.classList.remove('translate-y-20', 'opacity-0');
+                setTimeout(() => {
+                    toast.classList.add('translate-y-20', 'opacity-0');
+                }, 3000);
+            },
+
+            // QUIZ GAMEPLAY CONTROLLER
+            renderHomeQuizzes() {
+                const container = document.getElementById('quiz-cards-container');
+                document.getElementById('quiz-count-badge').innerText = `${this.quizzes.length} Kuis`;
+
+                if (this.quizzes.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full text-center py-12 bg-purple-950/40 rounded-3xl border border-purple-800">
+                            <i class="fa-solid fa-folder-open text-4xl text-purple-400 mb-2"></i>
+                            <p class="text-purple-300">Belum ada kuis tersedia. Minta Admin membuat kuis!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.quizzes.map((q) => `
+                    <div class="quiz-card-hover border border-purple-800/80 rounded-3xl p-6 flex flex-col justify-between shadow-xl relative overflow-hidden" style="background-color: ${this.settings.cardBg || '#1e1338'}">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="bg-purple-900/80 border border-purple-700 text-purple-300 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">
+                                    PIN: ${q.pin}
+                                </span>
+                                <span class="text-xs text-purple-300/80 font-semibold">
+                                    <i class="fa-solid fa-list-check mr-1"></i>${q.questions.length} Soal
+                                </span>
+                            </div>
+                            <h3 class="font-fredoka text-xl font-bold text-white mb-2 leading-snug">${q.title}</h3>
+                            <p class="text-purple-300/80 text-xs line-clamp-2 mb-4">${q.description || 'Kuis interaktif'}</p>
+                        </div>
+
+                        <button onclick="app.startQuiz('${q.id}')" class="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 font-bold text-white text-sm shadow-lg transition flex items-center justify-center space-x-2">
+                            <i class="fa-solid fa-play"></i>
+                            <span>Mulai Main</span>
+                        </button>
+                    </div>
+                `).join('');
+            },
+
+            joinByPin() {
+                const pin = document.getElementById('join-pin-input').value.trim();
+                if (!pin) {
+                    this.showToast('Masukkan Kode PIN terlebih dahulu!', 'fa-triangle-exclamation');
+                    return;
+                }
+                const found = this.quizzes.find(q => q.pin === pin);
+                if (found) {
+                    this.startQuiz(found.id);
+                    document.getElementById('join-pin-input').value = '';
+                } else {
+                    this.showToast('Kode PIN Kuis tidak ditemukan!', 'fa-circle-xmark');
+                }
+            },
+
+            startQuiz(quizId) {
+                this.currentQuiz = this.quizzes.find(q => q.id === quizId);
+                if (!this.currentQuiz || this.currentQuiz.questions.length === 0) {
+                    this.showToast('Kuis tidak memiliki soal!', 'fa-circle-exclamation');
+                    return;
+                }
+
+                this.currentQuestionIdx = 0;
+                this.score = 0;
+                this.streak = 0;
+                this.maxStreak = 0;
+                this.correctAnswersCount = 0;
+
+                this.updateHeaderStats();
+                this.navTo('play');
+                this.loadQuestion();
+            },
+
+            updateHeaderStats() {
+                document.getElementById('header-score').innerText = this.score;
+                document.getElementById('header-streak').innerText = this.streak;
+            },
+
+            loadQuestion() {
+                clearInterval(this.timerInterval);
+                const q = this.currentQuiz.questions[this.currentQuestionIdx];
+                const totalQ = this.currentQuiz.questions.length;
+
+                // Progress update
+                document.getElementById('question-progress-text').innerText = `Soal ${this.currentQuestionIdx + 1}/${totalQ}`;
+                document.getElementById('question-progress-bar').style.width = `${((this.currentQuestionIdx + 1) / totalQ) * 100}%`;
+
+                // Question Text
+                document.getElementById('question-text').innerText = q.question;
+
+                const qType = q.type || 'multiple_choice';
+                const container = document.getElementById('options-container');
+
+                if (qType === 'essay') {
+                    container.innerHTML = `
+                        <div class="col-span-full space-y-3">
+                            <textarea id="essay-answer-input" rows="3" placeholder="Ketik jawaban esai kamu di sini..." 
+                                class="w-full p-4 rounded-2xl bg-purple-950/90 border-2 border-purple-600 text-white placeholder-purple-400 font-semibold text-base focus:outline-none focus:border-pink-500 shadow-inner resize-none"></textarea>
+                            <button onclick="app.submitEssayAnswer()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white text-lg shadow-xl transition active:scale-95 flex items-center justify-center space-x-2">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Kirim Jawaban Esai</span>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // Options (Quizizz Color Scheme)
+                    const colors = [
+                        { bg: 'bg-quiz-red hover:bg-red-700', border: 'border-red-500', icon: 'fa-circle' },
+                        { bg: 'bg-quiz-blue hover:bg-blue-700', border: 'border-blue-500', icon: 'fa-diamond' },
+                        { bg: 'bg-quiz-yellow hover:bg-amber-600', border: 'border-amber-400', icon: 'fa-square' },
+                        { bg: 'bg-quiz-green hover:bg-emerald-700', border: 'border-emerald-500', icon: 'fa-triangle' }
+                    ];
+
+                    container.innerHTML = (q.options || []).map((opt, i) => {
+                        const c = colors[i % colors.length];
+                        return `
+                            <button onclick="app.submitAnswer(${i})" class="btn-option ${c.bg} ${c.border} border-2 p-5 rounded-2xl text-left font-bold text-white text-base md:text-lg flex items-center space-x-4 shadow-lg w-full transition">
+                                <i class="fa-solid ${c.icon} text-lg opacity-80"></i>
+                                <span class="flex-1">${opt}</span>
+                            </button>
+                        `;
+                    }).join('');
+                }
+
+                // Reset feedback
+                const feedbackBanner = document.getElementById('answer-feedback-banner');
+                feedbackBanner.classList.add('hidden');
+
+                // Timer setup
+                const timerContainer = document.getElementById('game-timer-container');
+                if (this.settings.useTimer !== false) {
+                    timerContainer.classList.remove('hidden');
+                    this.timeLeft = q.timeLimit || 15;
+                    this.isAnsweringAllowed = true;
+                    this.startTimer();
+                } else {
+                    timerContainer.classList.add('hidden');
+                    this.isAnsweringAllowed = true;
+                }
+            },
+
+            startTimer() {
+                const timerText = document.getElementById('timer-text');
+                timerText.innerText = `${this.timeLeft}s`;
+
+                this.timerInterval = setInterval(() => {
+                    this.timeLeft--;
+                    timerText.innerText = `${this.timeLeft}s`;
+
+                    if (this.timeLeft <= 0) {
+                        clearInterval(this.timerInterval);
+                        const q = this.currentQuiz.questions[this.currentQuestionIdx];
+                        if (q.type === 'essay') {
+                            this.submitEssayAnswer(true); // timeout
+                        } else {
+                            this.submitAnswer(-1); // Timeout
+                        }
+                    }
+                }, 1000);
+            },
+
+            submitEssayAnswer(isTimeout = false) {
+                if (!this.isAnsweringAllowed) return;
+                const input = document.getElementById('essay-answer-input');
+                const userAns = isTimeout ? '' : (input ? input.value.trim() : '');
+
+                if (!isTimeout && !userAns) {
+                    this.showToast('Harap tuliskan jawaban kamu terlebih dahulu!', 'fa-triangle-exclamation');
+                    return;
+                }
+
+                this.isAnsweringAllowed = false;
+                clearInterval(this.timerInterval);
+
+                const q = this.currentQuiz.questions[this.currentQuestionIdx];
+                const keyAns = (q.sampleAnswer || '').toLowerCase().trim();
+                const userAnsLower = userAns.toLowerCase();
+
+                let isCorrect = false;
+                if (!isTimeout) {
+                    if (keyAns) {
+                        const keywords = keyAns.split(/[\s,;.]+/).filter(w => w.length > 2);
+                        if (keywords.length > 0) {
+                            isCorrect = keywords.some(kw => userAnsLower.includes(kw)) || userAnsLower.includes(keyAns);
+                        } else {
+                            isCorrect = userAnsLower.includes(keyAns);
+                        }
+                    } else {
+                        // If no key answer specified, non-empty response earns points
+                        isCorrect = userAns.length > 0;
+                    }
+                }
+
+                this.processAnswerFeedback(isCorrect, isTimeout ? 'timeout' : 'essay', q);
+            },
+
+            submitAnswer(selectedIndex) {
+                if (!this.isAnsweringAllowed) return;
+                this.isAnsweringAllowed = false;
+                clearInterval(this.timerInterval);
+
+                const q = this.currentQuiz.questions[this.currentQuestionIdx];
+                const isCorrect = selectedIndex === q.correctIndex;
+
+                this.processAnswerFeedback(isCorrect, selectedIndex, q);
+            },
+
+            processAnswerFeedback(isCorrect, answerMeta, questionObj) {
+                const feedbackBanner = document.getElementById('answer-feedback-banner');
+                const feedbackMessage = document.getElementById('feedback-message');
+
+                if (isCorrect) {
+                    soundFX.playCorrect();
+                    this.streak++;
+                    if (this.streak > this.maxStreak) this.maxStreak = this.streak;
+                    this.correctAnswersCount++;
+
+                    // Speed bonus logic
+                    const speedBonus = this.settings.useTimer ? Math.round((this.timeLeft / (questionObj.timeLimit || 15)) * 500) : 300;
+                    const questionPoints = 1000 + speedBonus + (this.streak > 1 ? 200 : 0);
+                    this.score += questionPoints;
+
+                    feedbackBanner.className = "p-4 rounded-2xl text-center font-bold text-xl transition-all duration-300 bg-green-600/90 text-white border border-green-400 shadow-xl";
+                    feedbackMessage.innerText = `✨ Benar! +${questionPoints} Poin ${this.streak > 1 ? '🔥 Streak ' + this.streak : ''}`;
+                } else {
+                    soundFX.playWrong();
+                    this.streak = 0;
+                    feedbackBanner.className = "p-4 rounded-2xl text-center font-bold text-xl transition-all duration-300 bg-red-600/90 text-white border border-red-400 shadow-xl";
+                    
+                    if (answerMeta === 'timeout') {
+                        feedbackMessage.innerText = '⏰ Waktu Habis!';
+                    } else if (questionObj.type === 'essay') {
+                        feedbackMessage.innerText = questionObj.sampleAnswer 
+                            ? `❌ Jawaban Kurang Tepat! Kunci: "${questionObj.sampleAnswer}"` 
+                            : '❌ Jawaban Belum Tepat!';
+                    } else {
+                        feedbackMessage.innerText = answerMeta === -1 ? '⏰ Waktu Habis!' : '❌ Ups, Jawaban Kurang Tepat!';
+                    }
+                }
+
+                feedbackBanner.classList.remove('hidden');
+                this.updateHeaderStats();
+
+                // Highlight buttons if multiple choice
+                if (questionObj.type !== 'essay') {
+                    const buttons = document.querySelectorAll('#options-container button');
+                    buttons.forEach((btn, idx) => {
+                        btn.disabled = true;
+                        if (idx === questionObj.correctIndex) {
+                            btn.classList.add('ring-4', 'ring-white', 'scale-102');
+                        } else if (idx === answerMeta) {
+                            btn.classList.add('opacity-40');
+                        } else {
+                            btn.classList.add('opacity-30');
+                        }
+                    });
+                }
+
+                setTimeout(() => {
+                    this.currentQuestionIdx++;
+                    if (this.currentQuestionIdx < this.currentQuiz.questions.length) {
+                        this.loadQuestion();
+                    } else {
+                        this.showResults();
+                    }
+                }, 2000);
+            },
+
+            showResults() {
+                const total = this.currentQuiz.questions.length;
+                const accuracy = Math.round((this.correctAnswersCount / total) * 100);
+
+                document.getElementById('result-quiz-title').innerText = this.currentQuiz.title;
+                document.getElementById('result-score').innerText = this.score;
+                document.getElementById('result-accuracy').innerText = `${accuracy}%`;
+                document.getElementById('result-streak').innerText = `${this.maxStreak}🔥`;
+
+                this.navTo('results');
+
+                // Trigger confetti celebration
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                }
+            },
+
+            restartCurrentQuiz() {
+                if (this.currentQuiz) {
+                    this.startQuiz(this.currentQuiz.id);
+                }
+            },
+
+            saveScoreToLeaderboard() {
+                const nameInput = document.getElementById('player-name-input');
+                const name = nameInput.value.trim() || 'Pemain Anonim';
+
+                const newEntry = {
+                    name: name,
+                    score: this.score,
+                    quizTitle: this.currentQuiz ? this.currentQuiz.title : 'Kuis',
+                    date: new Date().toLocaleDateString('id-ID')
+                };
+
+                this.leaderboard.push(newEntry);
+                this.leaderboard.sort((a, b) => b.score - a.score);
+                this.saveStorage();
+
+                this.showToast('Skor berhasil disimpan!');
+                this.navTo('leaderboard');
+            },
+
+            renderLeaderboard() {
+                const container = document.getElementById('leaderboard-list');
+                if (this.leaderboard.length === 0) {
+                    container.innerHTML = '<p class="text-center text-purple-300/70 py-6">Belum ada data papan skor.</p>';
+                    return;
+                }
+
+                container.innerHTML = this.leaderboard.slice(0, 10).map((item, index) => {
+                    let medal = `<span class="font-bold text-purple-300 text-sm w-6">#${index + 1}</span>`;
+                    if (index === 0) medal = '<span class="text-xl">🥇</span>';
+                    if (index === 1) medal = '<span class="text-xl">🥈</span>';
+                    if (index === 2) medal = '<span class="text-xl">🥉</span>';
+
+                    return `
+                        <div class="flex items-center justify-between p-3.5 bg-purple-950/60 rounded-xl border border-purple-800/60">
+                            <div class="flex items-center space-x-3">
+                                ${medal}
+                                <div>
+                                    <span class="font-bold text-white text-sm block">${item.name}</span>
+                                    <span class="text-[10px] text-purple-400">${item.quizTitle} • ${item.date}</span>
+                                </div>
+                            </div>
+                            <span class="font-fredoka text-amber-400 font-bold text-lg">${item.score} pts</span>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            clearLeaderboard() {
+                if (confirm('Apakah Anda yakin ingin menghapus seluruh papan skor?')) {
+                    this.leaderboard = [];
+                    this.saveStorage();
+                    this.renderLeaderboard();
+                    this.showToast('Papan skor telah direset.');
+                }
+            },
+
+            // ADMIN AUTHENTICATION & MANAGEMENT CONTROLLER
+            openAdminModal() {
+                if (this.isAdminLoggedIn) {
+                    this.navTo('admin');
+                } else {
+                    document.getElementById('modal-admin-auth').classList.remove('hidden');
+                    document.getElementById('admin-password-input').focus();
+                }
+            },
+
+            closeAdminModal() {
+                document.getElementById('modal-admin-auth').classList.add('hidden');
+                document.getElementById('admin-auth-error').classList.add('hidden');
+                document.getElementById('admin-password-input').value = '';
+            },
+
+            verifyAdminPassword(e) {
+                e.preventDefault();
+                const pass = document.getElementById('admin-password-input').value;
+                if (pass === this.adminPassword) {
+                    this.isAdminLoggedIn = true;
+                    this.closeAdminModal();
+                    this.showToast('Login Admin Berhasil!', 'fa-shield-halved');
+                    this.navTo('admin');
+                } else {
+                    document.getElementById('admin-auth-error').classList.remove('hidden');
+                }
+            },
+
+            logoutAdmin() {
+                this.isAdminLoggedIn = false;
+                this.showToast('Anda telah keluar dari Admin.');
+                this.navTo('home');
+            },
+
+            switchAdminTab(tab) {
+                const quizzesTab = document.getElementById('admin-tab-quizzes');
+                const appearanceTab = document.getElementById('admin-tab-appearance');
+                const contentQuizzes = document.getElementById('admin-content-quizzes');
+                const contentAppearance = document.getElementById('admin-content-appearance');
+
+                if (tab === 'quizzes') {
+                    quizzesTab.className = "px-5 py-3 font-fredoka text-lg font-bold border-b-2 border-pink-500 text-pink-400";
+                    appearanceTab.className = "px-5 py-3 font-fredoka text-lg font-bold text-purple-400 hover:text-purple-200";
+                    contentQuizzes.classList.remove('hidden');
+                    contentAppearance.classList.add('hidden');
+                } else {
+                    appearanceTab.className = "px-5 py-3 font-fredoka text-lg font-bold border-b-2 border-pink-500 text-pink-400";
+                    quizzesTab.className = "px-5 py-3 font-fredoka text-lg font-bold text-purple-400 hover:text-purple-200";
+                    contentAppearance.classList.remove('hidden');
+                    contentQuizzes.classList.add('hidden');
+                }
+            },
+
+            renderAdminDashboard() {
+                const container = document.getElementById('admin-quizzes-list');
+                container.innerHTML = this.quizzes.map((q) => `
+                    <div class="card-element border border-purple-800 p-5 rounded-2xl flex flex-wrap justify-between items-center gap-4" style="background-color: ${this.settings.cardBg || '#1e1338'}">
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h4 class="font-fredoka text-lg font-bold text-white">${q.title}</h4>
+                                <span class="bg-purple-900 border border-purple-700 text-amber-400 text-xs px-2 py-0.5 rounded font-bold">PIN: ${q.pin}</span>
+                            </div>
+                            <p class="text-xs text-purple-300 mt-1">${q.questions.length} Pertanyaan • ${q.description || 'Tanpa deskripsi'}</p>
+                        </div>
+
+                        <div class="flex items-center space-x-2">
+                            <button onclick="app.openEditQuizModal('${q.id}')" class="px-3.5 py-2 bg-purple-800 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition flex items-center space-x-1">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                <span>Edit Soal</span>
+                            </button>
+                            <button onclick="app.deleteQuiz('${q.id}')" class="px-3 py-2 bg-red-950 hover:bg-red-900 border border-red-800 text-red-300 rounded-xl text-xs font-bold transition">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            openCreateQuizModal() {
+                this.editingQuizTemp = {
+                    id: 'q_' + Date.now(),
+                    title: 'Kuis Baru',
+                    pin: Math.floor(1000 + Math.random() * 9000).toString(),
+                    description: 'Deskripsi kuis baru...',
+                    questions: [
+                        {
+                            type: 'multiple_choice',
+                            question: 'Tulis pertanyaan di sini...',
+                            options: ['Opsi A', 'Opsi B', 'Opsi C', 'Opsi D'],
+                            correctIndex: 0,
+                            timeLimit: 15
+                        }
+                    ]
+                };
+                this.renderQuizEditorModal();
+            },
+
+            openEditQuizModal(quizId) {
+                const found = this.quizzes.find(q => q.id === quizId);
+                if (found) {
+                    this.editingQuizTemp = JSON.parse(JSON.stringify(found));
+                    this.renderQuizEditorModal();
+                }
+            },
+
+            renderQuizEditorModal() {
+                const q = this.editingQuizTemp;
+                document.getElementById('edit-quiz-title').value = q.title;
+                document.getElementById('edit-quiz-pin').value = q.pin;
+                document.getElementById('edit-quiz-desc').value = q.description;
+
+                const questionsContainer = document.getElementById('modal-questions-editor-list');
+                questionsContainer.innerHTML = q.questions.map((quest, qIdx) => {
+                    const qType = quest.type || 'multiple_choice';
+                    return `
+                        <div class="bg-purple-950/70 p-5 rounded-2xl border border-purple-800 space-y-3 relative">
+                            <div class="flex justify-between items-center flex-wrap gap-2">
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-bold text-sm text-pink-400">Pertanyaan #${qIdx + 1}</span>
+                                    <select onchange="app.updateTempQuestionType(${qIdx}, this.value)" class="px-2.5 py-1 rounded-lg bg-purple-900 border border-purple-700 text-amber-300 font-bold text-xs focus:outline-none">
+                                        <option value="multiple_choice" ${qType === 'multiple_choice' ? 'selected' : ''}>Pilihan Ganda (PG)</option>
+                                        <option value="essay" ${qType === 'essay' ? 'selected' : ''}>Esai</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <div class="flex items-center space-x-1">
+                                        <span class="text-xs text-purple-300">Waktu (s):</span>
+                                        <input type="number" value="${quest.timeLimit || 15}" min="5" max="120" onchange="app.updateTempTimeLimit(${qIdx}, this.value)" class="w-16 px-2 py-1 rounded bg-purple-900 border border-purple-700 text-white text-xs">
+                                    </div>
+                                    <button onclick="app.removeQuestionFromEditingQuiz(${qIdx})" class="text-xs text-red-400 hover:text-red-300">
+                                        <i class="fa-solid fa-trash mr-1"></i>Hapus Soal
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <input type="text" value="${quest.question}" onchange="app.updateTempQuestionText(${qIdx}, this.value)" placeholder="Teks Pertanyaan"
+                                    class="w-full px-3 py-2 rounded-xl bg-purple-900 border border-purple-700 text-white text-sm focus:outline-none">
+                            </div>
+
+                            ${qType === 'essay' ? `
+                                <div>
+                                    <label class="block text-[11px] font-bold text-purple-300 uppercase mb-1">Kunci / Jawaban Acuan Esai (Opsional)</label>
+                                    <input type="text" value="${quest.sampleAnswer || ''}" onchange="app.updateTempSampleAnswer(${qIdx}, this.value)" placeholder="Contoh: Proses pembuatan makanan tumbuhan"
+                                        class="w-full px-3 py-2 rounded-xl bg-purple-900/80 border border-purple-700 text-yellow-200 text-xs focus:outline-none">
+                                </div>
+                            ` : `
+                                <!-- Options Inputs -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
+                                    ${(quest.options || ['A', 'B', 'C', 'D']).map((opt, oIdx) => `
+                                        <div class="flex items-center space-x-2 bg-purple-900/40 p-1.5 rounded-xl border border-purple-800">
+                                            <input type="radio" name="correct_${qIdx}" ${quest.correctIndex === oIdx ? 'checked' : ''} onchange="app.setTempCorrectAnswer(${qIdx}, ${oIdx})" class="accent-green-500 cursor-pointer">
+                                            <input type="text" value="${opt}" onchange="app.updateTempOptionText(${qIdx}, ${oIdx}, this.value)" class="flex-1 px-2 py-1 bg-transparent text-white text-xs focus:outline-none">
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `}
+                        </div>
+                    `;
+                }).join('');
+
+                document.getElementById('modal-edit-quiz').classList.remove('hidden');
+            },
+
+            updateTempQuestionType(qIdx, type) {
+                this.editingQuizTemp.questions[qIdx].type = type;
+                if (type === 'multiple_choice' && !this.editingQuizTemp.questions[qIdx].options) {
+                    this.editingQuizTemp.questions[qIdx].options = ['Opsi A', 'Opsi B', 'Opsi C', 'Opsi D'];
+                    this.editingQuizTemp.questions[qIdx].correctIndex = 0;
+                }
+                this.renderQuizEditorModal();
+            },
+
+            updateTempSampleAnswer(qIdx, val) {
+                this.editingQuizTemp.questions[qIdx].sampleAnswer = val;
+            },
+
+            updateTempQuestionText(qIdx, val) {
+                this.editingQuizTemp.questions[qIdx].question = val;
+            },
+
+            updateTempTimeLimit(qIdx, val) {
+                this.editingQuizTemp.questions[qIdx].timeLimit = parseInt(val) || 15;
+            },
+
+            updateTempOptionText(qIdx, oIdx, val) {
+                if (!this.editingQuizTemp.questions[qIdx].options) {
+                    this.editingQuizTemp.questions[qIdx].options = ['Opsi A', 'Opsi B', 'Opsi C', 'Opsi D'];
+                }
+                this.editingQuizTemp.questions[qIdx].options[oIdx] = val;
+            },
+
+            setTempCorrectAnswer(qIdx, oIdx) {
+                this.editingQuizTemp.questions[qIdx].correctIndex = oIdx;
+            },
+
+            addNewQuestionToEditingQuiz() {
+                this.editingQuizTemp.questions.push({
+                    type: 'multiple_choice',
+                    question: 'Pertanyaan Baru',
+                    options: ['Pilihan A', 'Pilihan B', 'Pilihan C', 'Pilihan D'],
+                    correctIndex: 0,
+                    timeLimit: 15
+                });
+                this.renderQuizEditorModal();
+            },
+
+            removeQuestionFromEditingQuiz(qIdx) {
+                if (this.editingQuizTemp.questions.length <= 1) {
+                    this.showToast('Minimal harus ada 1 pertanyaan!', 'fa-triangle-exclamation');
+                    return;
+                }
+                this.editingQuizTemp.questions.splice(qIdx, 1);
+                this.renderQuizEditorModal();
+            },
+
+            saveEditingQuiz() {
+                this.editingQuizTemp.title = document.getElementById('edit-quiz-title').value.trim() || 'Tanpa Judul';
+                this.editingQuizTemp.pin = document.getElementById('edit-quiz-pin').value.trim() || '1234';
+                this.editingQuizTemp.description = document.getElementById('edit-quiz-desc').value.trim();
+
+                const existingIdx = this.quizzes.findIndex(q => q.id === this.editingQuizTemp.id);
+                if (existingIdx >= 0) {
+                    this.quizzes[existingIdx] = this.editingQuizTemp;
+                } else {
+                    this.quizzes.push(this.editingQuizTemp);
+                }
+
+                this.saveStorage();
+                this.closeEditQuizModal();
+                this.renderAdminDashboard();
+                this.showToast('Kuis berhasil disimpan!');
+            },
+
+            closeEditQuizModal() {
+                document.getElementById('modal-edit-quiz').classList.add('hidden');
+            },
+
+            deleteQuiz(quizId) {
+                if (confirm('Yakin ingin menghapus kuis ini?')) {
+                    this.quizzes = this.quizzes.filter(q => q.id !== quizId);
+                    this.saveStorage();
+                    this.renderAdminDashboard();
+                    this.showToast('Kuis dihapus.');
+                }
+            },
+
+            saveAppearanceSettings(e) {
+                e.preventDefault();
+                this.settings.title = document.getElementById('setting-app-title').value;
+                this.settings.welcomeMsg = document.getElementById('setting-welcome-msg').value;
+                this.settings.themeBg = document.getElementById('setting-theme-bg').value;
+                this.settings.cardBg = document.getElementById('setting-card-bg').value;
+                this.settings.soundEnabled = document.getElementById('setting-sound-enabled').checked;
+                this.settings.useTimer = document.getElementById('setting-use-timer').checked;
+                this.settings.antiCheatTimer = parseInt(document.getElementById('setting-anti-cheat-timer').value) || 10;
+
+                this.saveStorage();
+                this.applySettings();
+                this.showToast('Tampilan & Pengaturan Web berhasil disimpan!');
+            },
+
+            resetSystemData() {
+                if (confirm('Kembalikan semua kuis dan pengaturan ke data awal?')) {
+                    localStorage.removeItem('quizizz_quizzes');
+                    localStorage.removeItem('quizizz_settings');
+                    localStorage.removeItem('quizizz_leaderboard');
+                    this.loadFromStorage();
+                    this.applySettings();
+                    this.renderAdminDashboard();
+                    this.showToast('Sistem direset ke kondisi awal.');
+                }
+            }
+        };
+
+        // Bootstrap application on window load
+        window.onload = () => {
+            app.init();
+        };
+    </script>
+</body>
+</html>
