@@ -51,6 +51,15 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             user-select: none;
             transition: background-color 0.3s ease;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        *, *:before, *:after {
+            box-sizing: border-box;
         }
         .quiz-card-hover {
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -91,44 +100,44 @@
 <body class="min-h-screen flex flex-col justify-between overflow-x-hidden" id="app-body">
 
     <!-- Header / Navbar -->
-    <header id="main-header" class="bg-quiz-darkPurple border-b border-purple-900/50 sticky top-0 z-30 px-4 py-3 shadow-lg transition-colors duration-300">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
+    <header id="main-header" class="bg-quiz-darkPurple border-b border-purple-900/50 sticky top-0 z-30 px-3 md:px-4 py-3 shadow-lg transition-colors duration-300 w-full">
+        <div class="max-w-7xl mx-auto flex justify-between items-center w-full">
             <!-- Brand Logo -->
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.requestDrawerNav('home')">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 p-0.5 shadow-lg overflow-hidden flex items-center justify-center">
+            <div class="flex items-center space-x-2 md:space-x-3 cursor-pointer min-w-0" onclick="app.requestDrawerNav('home')">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-500 p-0.5 shadow-lg overflow-hidden flex items-center justify-center flex-shrink-0">
                     <img id="app-logo-img" src="https://lh3.googleusercontent.com/d/1L5cfJ9TJxL9DbxAFw1z-XEqeQUWsrYJa" alt="Auraphone Logo" 
                          class="w-full h-full object-cover rounded-xl" 
                          onerror="this.onerror=null; this.src='https://placehold.co/100x100/46178f/ffffff?text=AQ'">
                 </div>
-                <span id="app-title-display" class="font-fredoka text-2xl font-bold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-purple-300 via-pink-300 to-white">
+                <span id="app-title-display" class="font-fredoka text-lg md:text-2xl font-bold tracking-wide bg-clip-text text-transparent bg-gradient-to-r from-purple-300 via-pink-300 to-white truncate">
                     Auraphone Quiz
                 </span>
             </div>
 
             <!-- Header Quick Info / Actions -->
-            <div class="flex items-center space-x-3 md:space-x-4">
+            <div class="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
                 <!-- IP Network Sync Status Badge -->
-                <div id="cloud-status-badge" onclick="app.requestDrawerNav('sync')" class="cursor-pointer flex items-center space-x-2 bg-purple-950/80 px-3 py-1.5 rounded-full border border-purple-700/50 hover:border-pink-500/50 transition text-xs font-semibold">
+                <div id="cloud-status-badge" onclick="app.requestDrawerNav('sync')" class="cursor-pointer flex items-center space-x-1.5 md:space-x-2 bg-purple-950/80 px-2.5 md:px-3 py-1.5 rounded-full border border-purple-700/50 hover:border-pink-500/50 transition text-xs font-semibold">
                     <i id="cloud-status-icon" class="fa-solid fa-spinner fa-spin text-amber-400"></i>
-                    <span id="cloud-status-text" class="text-amber-300">Mendeteksi Internet...</span>
+                    <span id="cloud-status-text" class="text-amber-300 truncate max-w-[90px] sm:max-w-none">Mendeteksi...</span>
                 </div>
 
                 <!-- Score Display in game -->
-                <div id="game-stats-header" class="hidden flex items-center space-x-3 bg-purple-950/80 px-4 py-1.5 rounded-full border border-purple-700/40">
-                    <div class="flex items-center space-x-1 text-yellow-400 font-bold text-sm">
+                <div id="game-stats-header" class="hidden items-center space-x-2 md:space-x-3 bg-purple-950/80 px-3 md:px-4 py-1.5 rounded-full border border-purple-700/40">
+                    <div class="flex items-center space-x-1 text-yellow-400 font-bold text-xs md:text-sm">
                         <i class="fa-solid text-amber-400">⚡</i>
                         <span id="header-score">0</span>
                     </div>
                     <div class="h-4 w-[1px] bg-purple-700/50"></div>
-                    <div class="flex items-center space-x-1 text-orange-400 font-bold text-sm">
+                    <div class="flex items-center space-x-1 text-orange-400 font-bold text-xs md:text-sm">
                         <i class="fa-solid fa-fire"></i>
                         <span id="header-streak">0</span>
                     </div>
                 </div>
 
                 <!-- Hamburger Menu Button (Garis 3) -->
-                <button id="btn-hamburger" onclick="app.toggleDrawer()" class="p-2.5 rounded-xl bg-purple-900/60 hover:bg-purple-800 text-white transition focus:outline-none border border-purple-700/50">
-                    <i class="fa-solid fa-bars text-xl"></i>
+                <button id="btn-hamburger" onclick="app.toggleDrawer()" class="p-2 md:p-2.5 rounded-xl bg-purple-900/60 hover:bg-purple-800 text-white transition focus:outline-none border border-purple-700/50 flex-shrink-0">
+                    <i class="fa-solid fa-bars text-lg md:text-xl"></i>
                 </button>
             </div>
         </div>
@@ -137,7 +146,7 @@
     <!-- Side Drawer Menu -->
     <div id="drawer-backdrop" onclick="app.toggleDrawer(false)" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
 
-    <aside id="drawer-menu" class="fixed top-0 right-0 h-full w-80 bg-quiz-darkPurple border-l border-purple-800/50 z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between p-6 shadow-2xl">
+    <aside id="drawer-menu" class="fixed top-0 right-0 h-full w-72 md:w-80 bg-quiz-darkPurple border-l border-purple-800/50 z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between p-5 md:p-6 shadow-2xl max-w-full">
         <div>
             <!-- Drawer Header -->
             <div class="flex items-center justify-between border-b border-purple-800/60 pb-4 mb-6">
@@ -188,28 +197,28 @@
     </aside>
 
     <!-- MAIN VIEW CONTAINER -->
-    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6">
+    <main class="flex-grow max-w-7xl w-full mx-auto p-3 md:p-6 overflow-x-hidden">
 
         <!-- VIEW 1: HOME / QUIZ LIBRARY -->
-        <section id="view-home" class="space-y-8">
+        <section id="view-home" class="space-y-6 md:space-y-8 w-full max-w-full">
             <!-- Hero Banner & Join Code -->
-            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 p-6 md:p-10 border border-purple-700/40 shadow-2xl">
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-purple-900 via-indigo-900 to-purple-950 p-5 md:p-10 border border-purple-700/40 shadow-2xl w-full">
                 <div class="relative z-10 max-w-2xl">
-                    <span class="bg-pink-500/20 text-pink-300 text-xs font-bold px-3 py-1 rounded-full border border-pink-500/30 inline-block mb-3">
-                        ⚡ Quizizz Interactive Platform • Real-time WiFi Sync
+                    <span class="bg-pink-500/20 text-pink-300 text-[11px] md:text-xs font-bold px-3 py-1 rounded-full border border-pink-500/30 inline-block mb-3">
+                        ⚡ Situs web Auraphone Quiz
                     </span>
-                    <h1 id="welcome-message" class="font-fredoka text-3xl md:text-5xl font-bold mb-4 text-white leading-tight">
+                    <h1 id="welcome-message" class="font-fredoka text-2xl sm:text-3xl md:text-5xl font-bold mb-3 md:mb-4 text-white leading-tight">
                         Asah Pengetahuanmu Sekarang!
                     </h1>
-                    <p class="text-purple-200 text-sm md:text-base mb-6">
-                        Pilih kuis interaktif di bawah atau masukkan Kode PIN kuis dari gurumu. Kuis yang dibuat di HP/Laptop mana saja langsung tersinkronisasi otomatis ke seluruh perangkat pada jaringan WiFi yang sama!
+                    <p class="text-purple-200 text-xs sm:text-sm md:text-base mb-6 leading-relaxed">
+                        Pilih kuis interaktif di bawah atau masukkan Kode PIN kuis dari admin
                     </p>
 
                     <!-- Join PIN Form -->
-                    <div class="flex flex-col sm:flex-row gap-2 max-w-md">
+                    <div class="flex flex-col sm:flex-row gap-2.5 max-w-md w-full">
                         <input type="text" id="join-pin-input" placeholder="Masukkan Kode Kuis (mis. 1234)" 
-                            class="flex-1 px-5 py-3.5 rounded-2xl bg-purple-950/80 border-2 border-purple-500/50 text-white placeholder-purple-400/70 font-semibold focus:outline-none focus:border-pink-500 transition text-center sm:text-left">
-                        <button onclick="app.joinByPin()" class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white shadow-lg transition transform active:scale-95 flex items-center justify-center space-x-2">
+                            class="w-full sm:flex-1 px-4 md:px-5 py-3.5 rounded-2xl bg-purple-950/80 border-2 border-purple-500/50 text-white placeholder-purple-400/70 font-semibold focus:outline-none focus:border-pink-500 transition text-center sm:text-left text-sm md:text-base">
+                        <button onclick="app.joinByPin()" class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white shadow-lg transition transform active:scale-95 flex items-center justify-center space-x-2 text-sm md:text-base">
                             <span>Mulai</span>
                             <i class="fa-solid fa-arrow-right"></i>
                         </button>
@@ -217,22 +226,22 @@
                 </div>
                 
                 <!-- Decorative Graphic -->
-                <div class="absolute -right-10 -bottom-10 opacity-20 md:opacity-30 pointer-events-none">
-                    <i class="fa-solid fa-gamepad text-[220px] text-purple-400"></i>
+                <div class="absolute -right-10 -bottom-10 opacity-10 sm:opacity-20 md:opacity-30 pointer-events-none">
+                    <i class="fa-solid fa-gamepad text-[180px] md:text-[220px] text-purple-400"></i>
                 </div>
             </div>
 
             <!-- Quiz Selection Grid -->
-            <div>
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="font-fredoka text-2xl font-bold text-white flex items-center space-x-2">
+            <div class="w-full">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+                    <h2 class="font-fredoka text-xl md:text-2xl font-bold text-white flex items-center space-x-2">
                         <i class="fa-solid fa-fire-flame-curved text-amber-400"></i>
                         <span>Daftar Kuis Tersedia</span>
                     </h2>
-                    <div class="flex items-center space-x-2">
+                    <div class="flex items-center space-x-2 self-start sm:self-auto">
                         <button onclick="syncEngine.requestSync()" title="Sinkronkan ulang" class="px-3 py-1.5 bg-purple-900/80 hover:bg-purple-800 border border-purple-700 rounded-full text-xs text-purple-200 transition flex items-center space-x-1">
                             <i class="fa-solid fa-rotate"></i>
-                            <span class="hidden sm:inline">Sync Kuis</span>
+                            <span class="inline">Sync Kuis</span>
                         </button>
                         <span id="quiz-count-badge" class="text-xs font-semibold bg-purple-900/60 border border-purple-700 px-3 py-1.5 rounded-full text-purple-300">
                             0 Kuis
@@ -240,127 +249,127 @@
                     </div>
                 </div>
 
-                <div id="quiz-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="quiz-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full">
                     <!-- Quiz Cards Injected via JS -->
                 </div>
             </div>
         </section>
 
         <!-- VIEW 2: QUIZ GAMEPLAY -->
-        <section id="view-play" class="hidden max-w-4xl mx-auto space-y-6">
+        <section id="view-play" class="hidden max-w-4xl mx-auto space-y-4 md:space-y-6 w-full">
             <!-- Game Top Info Bar -->
-            <div id="game-info-bar" class="card-element bg-quiz-darkPurple p-4 rounded-2xl border border-purple-800/60 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+            <div id="game-info-bar" class="card-element bg-quiz-darkPurple p-3.5 md:p-4 rounded-2xl border border-purple-800/60 flex flex-wrap items-center justify-between gap-3 shadow-xl w-full">
                 <!-- Progress Indicator -->
-                <div class="flex items-center space-x-3">
-                    <span id="question-progress-text" class="text-sm font-bold text-purple-300">Soal 1/10</span>
-                    <div class="w-32 md:w-48 bg-purple-950 h-3 rounded-full overflow-hidden border border-purple-800">
+                <div class="flex items-center space-x-2.5 md:space-x-3 flex-1 min-w-[200px]">
+                    <span id="question-progress-text" class="text-xs md:text-sm font-bold text-purple-300 whitespace-nowrap">Soal 1/10</span>
+                    <div class="flex-1 bg-purple-950 h-3 rounded-full overflow-hidden border border-purple-800">
                         <div id="question-progress-bar" class="bg-gradient-to-r from-pink-500 to-purple-500 h-full w-0 transition-all duration-300"></div>
                     </div>
                 </div>
 
                 <!-- Timer Bar -->
-                <div id="game-timer-container" class="flex items-center space-x-2 bg-purple-950/80 px-4 py-2 rounded-xl border border-purple-700/50">
+                <div id="game-timer-container" class="flex items-center space-x-2 bg-purple-950/80 px-3.5 py-1.5 md:px-4 md:py-2 rounded-xl border border-purple-700/50 flex-shrink-0">
                     <i class="fa-solid fa-clock text-amber-400" id="timer-icon"></i>
-                    <span id="timer-text" class="font-fredoka text-lg font-bold text-amber-300">20s</span>
+                    <span id="timer-text" class="font-fredoka text-base md:text-lg font-bold text-amber-300">20s</span>
                 </div>
             </div>
 
             <!-- Question Card -->
-            <div id="question-card" class="card-element bg-gradient-to-b from-purple-900/90 to-quiz-darkPurple p-5 md:p-8 rounded-3xl border border-purple-700/50 shadow-2xl relative overflow-hidden min-h-[200px] flex flex-col justify-center items-center text-center">
+            <div id="question-card" class="card-element bg-gradient-to-b from-purple-900/90 to-quiz-darkPurple p-4 sm:p-6 md:p-8 rounded-3xl border border-purple-700/50 shadow-2xl relative overflow-hidden min-h-[180px] md:min-h-[200px] flex flex-col justify-center items-center text-center w-full">
                 <!-- Point value badge -->
-                <span id="question-points-badge" class="absolute top-4 right-4 bg-purple-800/80 border border-purple-600 text-purple-200 text-xs font-bold px-3 py-1 rounded-full">
+                <span id="question-points-badge" class="absolute top-3 right-3 md:top-4 md:right-4 bg-purple-800/80 border border-purple-600 text-purple-200 text-[10px] md:text-xs font-bold px-2.5 py-1 rounded-full">
                     +1000 Poin max
                 </span>
 
                 <!-- Question Text -->
-                <h2 id="question-text" class="font-fredoka text-xl md:text-3xl font-bold text-white leading-relaxed mt-2">
+                <h2 id="question-text" class="font-fredoka text-lg sm:text-xl md:text-3xl font-bold text-white leading-relaxed mt-2 w-full break-words">
                     Loading soal...
                 </h2>
 
                 <!-- Question Optional Image -->
-                <div id="question-image-container" class="mt-4 hidden">
+                <div id="question-image-container" class="mt-4 hidden w-full">
                     <img id="question-image" src="" alt="Soal Media" class="max-h-48 rounded-xl border border-purple-600/50 object-contain mx-auto shadow-md">
                 </div>
             </div>
 
             <!-- Answer Options Grid -->
-            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-3.5 md:gap-4 w-full">
                 <!-- Option buttons generated via JS -->
             </div>
 
             <!-- Feedback Overlay -->
-            <div id="answer-feedback-banner" class="hidden p-4 rounded-2xl text-center font-bold text-xl transition-all duration-300 animate-bounce">
+            <div id="answer-feedback-banner" class="hidden p-3.5 md:p-4 rounded-2xl text-center font-bold text-lg md:text-xl transition-all duration-300 animate-bounce w-full">
                 <span id="feedback-message">Jawaban Benar!</span>
             </div>
         </section>
 
         <!-- VIEW 3: RESULTS SUMMARY -->
-        <section id="view-results" class="hidden max-w-2xl mx-auto text-center space-y-6">
-            <div class="bg-quiz-darkPurple border border-purple-700/60 p-8 rounded-3xl shadow-2xl space-y-6 relative overflow-hidden">
-                <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-400 to-yellow-300 text-purple-950 flex items-center justify-center text-4xl shadow-xl font-fredoka">
+        <section id="view-results" class="hidden max-w-2xl mx-auto text-center space-y-6 w-full">
+            <div class="bg-quiz-darkPurple border border-purple-700/60 p-5 sm:p-8 rounded-3xl shadow-2xl space-y-6 relative overflow-hidden w-full">
+                <div class="w-16 h-16 md:w-20 md:h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-400 to-yellow-300 text-purple-950 flex items-center justify-center text-3xl md:text-4xl shadow-xl font-fredoka">
                     🏆
                 </div>
 
                 <div>
-                    <h2 class="font-fredoka text-3xl md:text-4xl font-bold text-white mb-1">Kuis Selesai!</h2>
-                    <p id="result-quiz-title" class="text-purple-300 text-sm">Nama Kuis</p>
+                    <h2 class="font-fredoka text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1">Kuis Selesai!</h2>
+                    <p id="result-quiz-title" class="text-purple-300 text-xs md:text-sm">Nama Kuis</p>
                 </div>
 
                 <!-- MAIN GRADE BOX (NILAI AKHIR 0-100 & PERSENTASE) -->
-                <div class="bg-gradient-to-r from-purple-900/90 via-indigo-900/90 to-purple-950 p-6 rounded-3xl border-2 border-pink-500/50 shadow-2xl text-center relative overflow-hidden">
-                    <span class="text-xs font-extrabold uppercase tracking-widest text-pink-300 bg-pink-500/20 px-3 py-1 rounded-full border border-pink-500/30">
+                <div class="bg-gradient-to-r from-purple-900/90 via-indigo-900/90 to-purple-950 p-5 md:p-6 rounded-3xl border-2 border-pink-500/50 shadow-2xl text-center relative overflow-hidden w-full">
+                    <span class="text-[10px] md:text-xs font-extrabold uppercase tracking-widest text-pink-300 bg-pink-500/20 px-3 py-1 rounded-full border border-pink-500/30">
                         Hasil Evaluasi Sistem
                     </span>
-                    <div class="mt-3 flex items-center justify-center space-x-3">
-                        <span class="text-gray-300 font-bold text-lg md:text-xl">Nilai Anda:</span>
-                        <span id="result-grade-display" class="font-fredoka text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-pink-400">
+                    <div class="mt-3 flex items-center justify-center space-x-2 md:space-x-3 flex-wrap">
+                        <span class="text-gray-300 font-bold text-base md:text-xl">Nilai Anda:</span>
+                        <span id="result-grade-display" class="font-fredoka text-4xl sm:text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-pink-400">
                             100
                         </span>
-                        <span class="text-2xl md:text-3xl font-extrabold text-amber-300">/ 100</span>
+                        <span class="text-xl md:text-3xl font-extrabold text-amber-300">/ 100</span>
                     </div>
-                    <p id="result-grade-summary" class="text-sm font-semibold text-purple-200 mt-2">
+                    <p id="result-grade-summary" class="text-xs md:text-sm font-semibold text-purple-200 mt-2">
                         Betul 4 dari 4 Soal (100%)
                     </p>
-                    <div id="result-grade-badge-text" class="mt-3 inline-block px-4 py-1.5 rounded-xl bg-purple-800/80 border border-purple-600 text-xs font-bold text-amber-300">
+                    <div id="result-grade-badge-text" class="mt-3 inline-block px-3 md:px-4 py-1.5 rounded-xl bg-purple-800/80 border border-purple-600 text-[11px] md:text-xs font-bold text-amber-300">
                         🏆 Sempurna! Semua jawaban benar!
                     </div>
                 </div>
 
                 <!-- Detailed Stats Cards -->
-                <div class="grid grid-cols-3 gap-3 pt-1">
-                    <div class="bg-purple-950/80 p-4 rounded-2xl border border-purple-800">
-                        <span class="text-xs text-purple-300 font-semibold block mb-1">Total Skor Poin</span>
-                        <span id="result-score" class="font-fredoka text-2xl md:text-3xl font-bold text-amber-400">0</span>
+                <div class="grid grid-cols-3 gap-2.5 md:gap-3 pt-1 w-full">
+                    <div class="bg-purple-950/80 p-3 md:p-4 rounded-2xl border border-purple-800">
+                        <span class="text-[10px] md:text-xs text-purple-300 font-semibold block mb-1">Total Skor</span>
+                        <span id="result-score" class="font-fredoka text-xl sm:text-2xl md:text-3xl font-bold text-amber-400 truncate">0</span>
                     </div>
-                    <div class="bg-purple-950/80 p-4 rounded-2xl border border-purple-800">
-                        <span class="text-xs text-purple-300 font-semibold block mb-1">Akurasi Soal</span>
-                        <span id="result-accuracy" class="font-fredoka text-2xl md:text-3xl font-bold text-green-400">0%</span>
+                    <div class="bg-purple-950/80 p-3 md:p-4 rounded-2xl border border-purple-800">
+                        <span class="text-[10px] md:text-xs text-purple-300 font-semibold block mb-1">Akurasi</span>
+                        <span id="result-accuracy" class="font-fredoka text-xl sm:text-2xl md:text-3xl font-bold text-green-400 truncate">0%</span>
                     </div>
-                    <div class="bg-purple-950/80 p-4 rounded-2xl border border-purple-800">
-                        <span class="text-xs text-purple-300 font-semibold block mb-1">Streak Terbaik</span>
-                        <span id="result-streak" class="font-fredoka text-2xl md:text-3xl font-bold text-orange-400">0</span>
+                    <div class="bg-purple-950/80 p-3 md:p-4 rounded-2xl border border-purple-800">
+                        <span class="text-[10px] md:text-xs text-purple-300 font-semibold block mb-1">Streak</span>
+                        <span id="result-streak" class="font-fredoka text-xl sm:text-2xl md:text-3xl font-bold text-orange-400 truncate">0</span>
                     </div>
                 </div>
 
                 <!-- Player Name Input for Leaderboard -->
-                <div id="save-score-box" class="bg-purple-900/40 p-4 rounded-2xl border border-purple-700/50 space-y-3">
-                    <label class="block text-sm text-purple-200 font-semibold">Simpan Skor ke Papan Peringkat:</label>
-                    <div class="flex gap-2">
+                <div id="save-score-box" class="bg-purple-900/40 p-4 rounded-2xl border border-purple-700/50 space-y-3 w-full">
+                    <label class="block text-xs md:text-sm text-purple-200 font-semibold text-left">Simpan Skor ke Papan Peringkat:</label>
+                    <div class="flex flex-col sm:flex-row gap-2 w-full">
                         <input type="text" id="player-name-input" placeholder="Nama Kamu..." maxlength="15"
-                            class="flex-1 px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white placeholder-purple-400 text-sm focus:outline-none focus:border-pink-500">
-                        <button onclick="app.saveScoreToLeaderboard()" class="px-5 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 font-bold text-white text-sm transition">
+                            class="w-full sm:flex-1 px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white placeholder-purple-400 text-xs md:text-sm focus:outline-none focus:border-pink-500">
+                        <button onclick="app.saveScoreToLeaderboard()" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 font-bold text-white text-xs md:text-sm transition">
                             Simpan
                         </button>
                     </div>
                 </div>
 
                 <!-- Actions -->
-                <div class="flex gap-3 pt-4">
-                    <button onclick="app.restartCurrentQuiz()" class="flex-1 py-3 px-4 rounded-xl bg-purple-800 hover:bg-purple-700 text-white font-bold transition flex items-center justify-center space-x-2">
+                <div class="flex flex-col sm:flex-row gap-3 pt-4 w-full">
+                    <button onclick="app.restartCurrentQuiz()" class="w-full sm:flex-1 py-3 px-4 rounded-xl bg-purple-800 hover:bg-purple-700 text-white font-bold transition flex items-center justify-center space-x-2 text-sm">
                         <i class="fa-solid fa-rotate-right"></i>
                         <span>Coba Lagi</span>
                     </button>
-                    <button onclick="app.navTo('home')" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold transition flex items-center justify-center space-x-2">
+                    <button onclick="app.navTo('home')" class="w-full sm:flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold transition flex items-center justify-center space-x-2 text-sm">
                         <i class="fa-solid fa-house"></i>
                         <span>Menu Utama</span>
                     </button>
@@ -369,89 +378,89 @@
         </section>
 
         <!-- VIEW 4: LEADERBOARD -->
-        <section id="view-leaderboard" class="hidden max-w-3xl mx-auto space-y-6">
-            <div class="flex items-center justify-between">
+        <section id="view-leaderboard" class="hidden max-w-3xl mx-auto space-y-6 w-full">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div>
-                    <h2 class="font-fredoka text-3xl font-bold text-white flex items-center space-x-3">
+                    <h2 class="font-fredoka text-2xl md:text-3xl font-bold text-white flex items-center space-x-3">
                         <i class="fa-solid fa-trophy text-amber-400"></i>
                         <span>Papan Peringkat Global</span>
                     </h2>
-                    <p class="text-purple-300 text-sm">Pemain teratas dari seluruh kuis</p>
+                    <p class="text-purple-300 text-xs md:text-sm mt-1">Pemain teratas dari seluruh kuis</p>
                 </div>
-                <button onclick="app.clearLeaderboard()" class="text-xs bg-red-950/60 hover:bg-red-900 border border-red-800/80 text-red-300 px-3 py-1.5 rounded-lg transition">
+                <button onclick="app.clearLeaderboard()" class="text-xs bg-red-950/60 hover:bg-red-900 border border-red-800/80 text-red-300 px-3.5 py-2 rounded-lg transition self-start sm:self-auto">
                     <i class="fa-solid fa-trash mr-1"></i> Reset Skor
                 </button>
             </div>
 
-            <div class="bg-quiz-darkPurple border border-purple-800/60 rounded-3xl p-4 md:p-6 shadow-xl">
-                <div id="leaderboard-list" class="space-y-2">
+            <div class="bg-quiz-darkPurple border border-purple-800/60 rounded-3xl p-4 md:p-6 shadow-xl w-full">
+                <div id="leaderboard-list" class="space-y-2 w-full">
                     <!-- Leaderboard items JS -->
                 </div>
             </div>
         </section>
 
         <!-- VIEW 5: ADMIN PANEL -->
-        <section id="view-admin" class="hidden space-y-8">
+        <section id="view-admin" class="hidden space-y-6 md:space-y-8 w-full">
             <!-- Admin Top Header -->
-            <div class="bg-gradient-to-r from-pink-950/80 via-purple-900/80 to-quiz-darkPurple border border-pink-500/30 p-6 rounded-3xl flex flex-wrap justify-between items-center gap-4 shadow-2xl">
+            <div class="bg-gradient-to-r from-pink-950/80 via-purple-900/80 to-quiz-darkPurple border border-pink-500/30 p-5 md:p-6 rounded-3xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-2xl w-full">
                 <div>
-                    <span class="bg-pink-500/20 text-pink-300 text-xs font-bold px-3 py-1 rounded-full border border-pink-500/30">
+                    <span class="bg-pink-500/20 text-pink-300 text-[11px] md:text-xs font-bold px-3 py-1 rounded-full border border-pink-500/30">
                         <i class="fa-solid fa-shield-halved mr-1"></i> Admin Dashboard
                     </span>
-                    <h2 class="font-fredoka text-3xl font-bold text-white mt-1">Pengaturan Web & Kelola Soal</h2>
+                    <h2 class="font-fredoka text-2xl md:text-3xl font-bold text-white mt-1">Pengaturan Web & Kelola Soal</h2>
                 </div>
-                <button onclick="app.logoutAdmin()" class="px-4 py-2 bg-red-950 border border-red-700 text-red-200 hover:bg-red-900 rounded-xl font-semibold text-sm transition flex items-center space-x-2">
+                <button onclick="app.logoutAdmin()" class="w-full sm:w-auto px-4 py-2 bg-red-950 border border-red-700 text-red-200 hover:bg-red-900 rounded-xl font-semibold text-xs md:text-sm transition flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-right-from-bracket"></i>
                     <span>Keluar Admin</span>
                 </button>
             </div>
 
             <!-- Admin Navigation Tabs -->
-            <div class="flex border-b border-purple-800 space-x-2">
-                <button id="admin-tab-quizzes" onclick="app.switchAdminTab('quizzes')" class="px-5 py-3 font-fredoka text-lg font-bold border-b-2 border-pink-500 text-pink-400">
+            <div class="flex border-b border-purple-800 space-x-2 overflow-x-auto w-full">
+                <button id="admin-tab-quizzes" onclick="app.switchAdminTab('quizzes')" class="px-4 md:px-5 py-3 font-fredoka text-base md:text-lg font-bold border-b-2 border-pink-500 text-pink-400 whitespace-nowrap">
                     <i class="fa-solid fa-layer-group mr-2"></i>Kelola Kuis
                 </button>
-                <button id="admin-tab-appearance" onclick="app.switchAdminTab('appearance')" class="px-5 py-3 font-fredoka text-lg font-bold text-purple-400 hover:text-purple-200">
+                <button id="admin-tab-appearance" onclick="app.switchAdminTab('appearance')" class="px-4 md:px-5 py-3 font-fredoka text-base md:text-lg font-bold text-purple-400 hover:text-purple-200 whitespace-nowrap">
                     <i class="fa-solid fa-palette mr-2"></i>Ubah Tampilan Web
                 </button>
             </div>
 
             <!-- TAB 1: KELOLA KUIS -->
-            <div id="admin-content-quizzes" class="space-y-6">
+            <div id="admin-content-quizzes" class="space-y-6 w-full">
                 <!-- Action Bar -->
-                <div class="flex justify-between items-center">
-                    <h3 class="font-fredoka text-xl font-bold text-purple-200">Daftar Kuis Saat Ini</h3>
-                    <button onclick="app.openCreateQuizModal()" class="px-4 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 font-bold text-white text-sm transition flex items-center space-x-2 shadow-lg">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <h3 class="font-fredoka text-lg md:text-xl font-bold text-purple-200">Daftar Kuis Saat Ini</h3>
+                    <button onclick="app.openCreateQuizModal()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 font-bold text-white text-xs md:text-sm transition flex items-center justify-center space-x-2 shadow-lg">
                         <i class="fa-solid fa-plus"></i>
                         <span>Buat Kuis Baru</span>
                     </button>
                 </div>
 
                 <!-- Admin Quizzes List -->
-                <div id="admin-quizzes-list" class="space-y-4">
+                <div id="admin-quizzes-list" class="space-y-4 w-full">
                     <!-- Dynamic List via JS -->
                 </div>
             </div>
 
             <!-- TAB 2: UBAH TAMPILAN WEB -->
-            <div id="admin-content-appearance" class="hidden card-element bg-quiz-darkPurple border border-purple-800/60 p-6 md:p-8 rounded-3xl space-y-6">
-                <h3 class="font-fredoka text-2xl font-bold text-white mb-4">Pengaturan Tampilan & Sistem</h3>
+            <div id="admin-content-appearance" class="hidden card-element bg-quiz-darkPurple border border-purple-800/60 p-5 md:p-8 rounded-3xl space-y-6 w-full">
+                <h3 class="font-fredoka text-xl md:text-2xl font-bold text-white mb-4">Pengaturan Tampilan & Sistem</h3>
 
-                <form onsubmit="app.saveAppearanceSettings(event)" class="space-y-5 max-w-2xl">
+                <form onsubmit="app.saveAppearanceSettings(event)" class="space-y-5 max-w-2xl w-full">
                     <div>
-                        <label class="block text-sm font-bold text-purple-300 mb-1">Judul Aplikasi (Header)</label>
-                        <input type="text" id="setting-app-title" class="w-full px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white focus:outline-none focus:border-pink-500">
+                        <label class="block text-xs md:text-sm font-bold text-purple-300 mb-1">Judul Aplikasi (Header)</label>
+                        <input type="text" id="setting-app-title" class="w-full px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-purple-300 mb-1">Teks Banner Selamat Datang</label>
-                        <textarea id="setting-welcome-msg" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white focus:outline-none focus:border-pink-500"></textarea>
+                        <label class="block text-xs md:text-sm font-bold text-purple-300 mb-1">Teks Banner Selamat Datang</label>
+                        <textarea id="setting-welcome-msg" rows="2" class="w-full px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500"></textarea>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-bold text-purple-300 mb-1">Warna Background Utama</label>
-                            <select id="setting-theme-bg" class="w-full px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white focus:outline-none focus:border-pink-500">
+                            <label class="block text-xs md:text-sm font-bold text-purple-300 mb-1">Warna Background Utama</label>
+                            <select id="setting-theme-bg" class="w-full px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
                                 <option value="#0f0a1c">Ungu Gelap (Quizizz Standard)</option>
                                 <option value="#090d16">Biru Midnight</option>
                                 <option value="#180a0a">Merah Cyber</option>
@@ -461,8 +470,8 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-purple-300 mb-1">Warna Elemen Kotak/Card</label>
-                            <select id="setting-card-bg" class="w-full px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white focus:outline-none focus:border-pink-500">
+                            <label class="block text-xs md:text-sm font-bold text-purple-300 mb-1">Warna Elemen Kotak/Card</label>
+                            <select id="setting-card-bg" class="w-full px-4 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
                                 <option value="#1e1338">Ungu Deep</option>
                                 <option value="#0d1b2a">Biru Navy</option>
                                 <option value="#2b0909">Merah Gelap</option>
@@ -475,30 +484,30 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="flex items-center justify-between p-4 bg-purple-950/60 rounded-xl border border-purple-800">
                             <div>
-                                <span class="font-bold text-white text-sm block">Timer Per Soal</span>
-                                <span class="text-xs text-purple-300">Aktifkan penghitung waktu kuis</span>
+                                <span class="font-bold text-white text-xs md:text-sm block">Timer Per Soal</span>
+                                <span class="text-[11px] text-purple-300">Aktifkan penghitung waktu kuis</span>
                             </div>
                             <input type="checkbox" id="setting-use-timer" class="w-5 h-5 accent-pink-500 cursor-pointer">
                         </div>
                         <div class="p-4 bg-purple-950/60 rounded-xl border border-purple-800">
-                            <label class="font-bold text-white text-sm block mb-1">Timer Peringatan Keluar Tab (Detik)</label>
+                            <label class="font-bold text-white text-xs md:text-sm block mb-1">Timer Peringatan Keluar Tab (Detik)</label>
                             <input type="number" id="setting-anti-cheat-timer" min="5" max="60" class="w-full px-3 py-1.5 rounded-lg bg-purple-900 border border-purple-700 text-white text-sm focus:outline-none">
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between p-4 bg-purple-950/60 rounded-xl border border-purple-800">
                         <div>
-                            <span class="font-bold text-white text-sm block">Efek Suara (Audio Feedback)</span>
-                            <span class="text-xs text-purple-300">Mainkan nada saat memilih jawaban benar/salah & alarm anti-cheat</span>
+                            <span class="font-bold text-white text-xs md:text-sm block">Efek Suara (Audio Feedback)</span>
+                            <span class="text-[11px] text-purple-300">Mainkan nada saat memilih jawaban & alarm anti-cheat</span>
                         </div>
                         <input type="checkbox" id="setting-sound-enabled" class="w-5 h-5 accent-pink-500 cursor-pointer">
                     </div>
 
-                    <div class="pt-4 flex gap-3">
-                        <button type="submit" class="px-6 py-3 rounded-xl bg-pink-600 hover:bg-pink-700 font-bold text-white shadow-lg transition">
+                    <div class="pt-4 flex flex-col sm:flex-row gap-3 w-full">
+                        <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-pink-600 hover:bg-pink-700 font-bold text-white text-sm shadow-lg transition">
                             Simpan Perubahan
                         </button>
-                        <button type="button" onclick="app.resetSystemData()" class="px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-sm transition">
+                        <button type="button" onclick="app.resetSystemData()" class="w-full sm:w-auto px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-xs md:text-sm transition">
                             Reset ke Data Bawaan
                         </button>
                     </div>
@@ -509,29 +518,29 @@
     </main>
 
     <!-- FOOTER COPYRIGHT -->
-    <footer class="text-center py-5 text-xs text-purple-300/60 border-t border-purple-900/40 mt-8">
+    <footer class="text-center py-5 text-xs text-purple-300/60 border-t border-purple-900/40 mt-8 w-full">
         © Copyright 2026 Auraphone Systems, All Right Reserved.
     </footer>
 
     <!-- MODAL: MID-QUIZ NAVIGATION CONFIRMATION (SAFEGUARD POP-UP) -->
-    <div id="modal-confirm-abandon" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
-        <div class="bg-quiz-darkPurple border-2 border-pink-500/70 w-full max-w-md rounded-3xl p-6 md:p-8 shadow-2xl text-center space-y-6 my-auto">
-            <div class="w-16 h-16 bg-pink-500/20 text-pink-400 border border-pink-500/40 rounded-2xl flex items-center justify-center mx-auto text-3xl">
+    <div id="modal-confirm-abandon" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 md:p-4 overflow-y-auto hidden">
+        <div class="bg-quiz-darkPurple border-2 border-pink-500/70 w-full max-w-md rounded-3xl p-5 md:p-8 shadow-2xl text-center space-y-5 md:space-y-6 my-auto max-h-[90vh] overflow-y-auto">
+            <div class="w-14 h-14 md:w-16 md:h-16 bg-pink-500/20 text-pink-400 border border-pink-500/40 rounded-2xl flex items-center justify-center mx-auto text-2xl md:text-3xl">
                 <i class="fa-solid fa-circle-question"></i>
             </div>
             
             <div class="space-y-2">
-                <h3 class="font-fredoka text-2xl font-bold text-white">Konfirmasi Keluar Kuis</h3>
-                <p class="text-purple-200 text-sm md:text-base font-semibold leading-relaxed bg-purple-950/80 p-4 rounded-2xl border border-purple-800">
+                <h3 class="font-fredoka text-xl md:text-2xl font-bold text-white">Konfirmasi Keluar Kuis</h3>
+                <p class="text-purple-200 text-xs md:text-base font-semibold leading-relaxed bg-purple-950/80 p-3.5 md:p-4 rounded-2xl border border-purple-800">
                     Jika anda mengklik iya, maka jawaban dan kuis anda di batalkan. ketuk tidak untuk melanjutkan
                 </p>
             </div>
 
-            <div class="flex gap-3 pt-2">
-                <button onclick="app.confirmAbandonQuiz()" class="flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 font-bold text-white text-base shadow-xl transition active:scale-95">
+            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                <button onclick="app.confirmAbandonQuiz()" class="w-full sm:flex-1 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-500 hover:to-pink-500 font-bold text-white text-sm md:text-base shadow-xl transition active:scale-95">
                     Iya, Batalkan
                 </button>
-                <button onclick="app.cancelAbandonQuiz()" class="flex-1 py-3.5 rounded-2xl bg-purple-800 hover:bg-purple-700 font-bold text-white text-base transition active:scale-95 border border-purple-600">
+                <button onclick="app.cancelAbandonQuiz()" class="w-full sm:flex-1 py-3.5 rounded-2xl bg-purple-800 hover:bg-purple-700 font-bold text-white text-sm md:text-base transition active:scale-95 border border-purple-600">
                     Tidak, Lanjutkan
                 </button>
             </div>
@@ -539,17 +548,17 @@
     </div>
 
     <!-- MODAL: NETWORK / SYNC STATUS & SETTINGS -->
-    <div id="modal-network-sync" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
-        <div class="bg-quiz-darkPurple border border-cyan-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
-            <button onclick="app.closeSyncModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+    <div id="modal-network-sync" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 md:p-4 overflow-y-auto hidden">
+        <div class="bg-quiz-darkPurple border border-cyan-500/40 w-full max-w-md rounded-3xl p-5 md:p-6 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
+            <button onclick="app.closeSyncModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-1">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
 
             <div class="text-center space-y-3 mb-6">
-                <div class="w-16 h-16 bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 rounded-2xl flex items-center justify-center mx-auto text-3xl">
+                <div class="w-14 h-14 md:w-16 md:h-16 bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 rounded-2xl flex items-center justify-center mx-auto text-2xl md:text-3xl">
                     <i class="fa-solid fa-network-wired"></i>
                 </div>
-                <h3 class="font-fredoka text-2xl font-bold text-white">Sinkronisasi WiFi / Jaringan</h3>
+                <h3 class="font-fredoka text-xl md:text-2xl font-bold text-white">Sinkronisasi WiFi / Jaringan</h3>
                 <p class="text-purple-300 text-xs leading-relaxed">
                     Perangkat yang terhubung ke **WiFi / Router yang sama** akan saling berbagi kuis secara langsung secara otomatis.
                 </p>
@@ -563,7 +572,7 @@
                     </div>
                     <div class="flex justify-between items-center text-xs text-purple-300">
                         <span>Alamat IP WiFi Publik:</span>
-                        <span id="sync-modal-ip-val" class="font-bold text-cyan-300">Mendeteksi...</span>
+                        <span id="sync-modal-ip-val" class="font-bold text-cyan-300 truncate max-w-[150px]">Mendeteksi...</span>
                     </div>
                     <div class="flex justify-between items-center text-xs text-purple-300">
                         <span>Status Relay WebSocket:</span>
@@ -571,7 +580,7 @@
                     </div>
                     <div class="flex justify-between items-center text-xs text-purple-300">
                         <span>ID Ruang Sync Saat Ini:</span>
-                        <span id="sync-modal-channel-val" class="font-mono text-amber-300 text-[11px]">wifi_default</span>
+                        <span id="sync-modal-channel-val" class="font-mono text-amber-300 text-[10px] truncate max-w-[130px]">wifi_default</span>
                     </div>
                 </div>
 
@@ -583,17 +592,17 @@
                 <div class="border-t border-purple-800 pt-3">
                     <label class="block text-xs font-bold text-purple-300 uppercase mb-1">Ganti Kode Ruang Manual (Opsional)</label>
                     <p class="text-[11px] text-purple-400 mb-2">Ketik Kode Ruang yang sama di kedua HP/Laptop untuk menghubungkan kuis secara spesifik:</p>
-                    <div class="flex gap-2">
+                    <div class="flex flex-col sm:flex-row gap-2">
                         <input type="text" id="custom-room-input" placeholder="mis: kelas_6a" 
-                            class="flex-1 px-3 py-2 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-cyan-500">
-                        <button onclick="syncEngine.setCustomRoom()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-xs transition">
+                            class="w-full sm:flex-1 px-3 py-2 rounded-xl bg-purple-950 border border-purple-700 text-white text-xs md:text-sm focus:outline-none focus:border-cyan-500">
+                        <button onclick="syncEngine.setCustomRoom()" class="w-full sm:w-auto px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-bold rounded-xl text-xs transition">
                             Terapkan
                         </button>
                     </div>
                 </div>
 
                 <div class="pt-2 flex gap-2">
-                    <button onclick="syncEngine.requestSync(); app.closeSyncModal();" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 font-bold text-white text-sm shadow-lg hover:from-purple-500 hover:to-pink-500 transition flex items-center justify-center space-x-2">
+                    <button onclick="syncEngine.requestSync(); app.closeSyncModal();" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 font-bold text-white text-xs md:text-sm shadow-lg hover:from-purple-500 hover:to-pink-500 transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-rotate"></i>
                         <span>Paksa Reconnect & Sync</span>
                     </button>
@@ -603,18 +612,18 @@
     </div>
 
     <!-- MODAL: ADMIN PASSWORD PROMPT -->
-    <div id="modal-admin-auth" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
-        <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-md rounded-3xl p-6 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
-            <button onclick="app.closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white">
+    <div id="modal-admin-auth" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-3 md:p-4 overflow-y-auto hidden">
+        <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-md rounded-3xl p-5 md:p-6 shadow-2xl relative my-auto max-h-[90vh] overflow-y-auto">
+            <button onclick="app.closeAdminModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-1">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
 
             <div class="text-center space-y-3 mb-6">
-                <div class="w-16 h-16 bg-pink-500/20 text-pink-400 border border-pink-500/40 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+                <div class="w-14 h-14 md:w-16 md:h-16 bg-pink-500/20 text-pink-400 border border-pink-500/40 rounded-2xl flex items-center justify-center mx-auto text-xl md:text-2xl">
                     <i class="fa-solid fa-key"></i>
                 </div>
-                <h3 class="font-fredoka text-2xl font-bold text-white">Otentikasi Web Admin</h3>
-                <p class="text-purple-300 text-sm">Masukkan password rahasia untuk mengubah soal & tampilan.</p>
+                <h3 class="font-fredoka text-xl md:text-2xl font-bold text-white">Otentikasi Web Admin</h3>
+                <p class="text-purple-300 text-xs md:text-sm">Masukkan password rahasia untuk mengubah soal & tampilan.</p>
             </div>
 
             <form onsubmit="app.verifyAdminPassword(event)" class="space-y-4">
@@ -622,14 +631,14 @@
                     <label class="block text-xs font-bold uppercase text-purple-300 mb-1">Password Admin</label>
                     <div class="relative">
                         <input type="password" id="admin-password-input" placeholder="••••••" 
-                            class="w-full px-4 py-3 rounded-xl bg-purple-950 border-2 border-purple-700 text-white text-center tracking-widest text-lg focus:outline-none focus:border-pink-500">
+                            class="w-full px-4 py-3 rounded-xl bg-purple-950 border-2 border-purple-700 text-white text-center tracking-widest text-base md:text-lg focus:outline-none focus:border-pink-500">
                     </div>
                     <p id="admin-auth-error" class="text-red-400 text-xs font-semibold mt-1 hidden text-center">
                         Password salah! Coba lagi.
                     </p>
                 </div>
 
-                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white shadow-lg transition">
+                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-pink-700 font-bold text-white text-sm shadow-lg transition">
                     Masuk Panel Admin
                 </button>
             </form>
@@ -637,56 +646,56 @@
     </div>
 
     <!-- MODAL: EDIT / CREATE QUIZ -->
-    <div id="modal-edit-quiz" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden overflow-y-auto">
-        <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-2xl rounded-3xl p-6 md:p-8 shadow-2xl relative my-8 max-h-[90vh] flex flex-col">
-            <button onclick="app.closeEditQuizModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 z-20">
+    <div id="modal-edit-quiz" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-3 md:p-4 hidden overflow-y-auto">
+        <div class="bg-quiz-darkPurple border border-pink-500/40 w-full max-w-2xl rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl relative my-4 max-h-[95vh] flex flex-col">
+            <button onclick="app.closeEditQuizModal()" class="absolute top-3 right-3 text-gray-400 hover:text-white p-2 z-20">
                 <i class="fa-solid fa-xmark text-xl"></i>
             </button>
 
-            <h3 class="font-fredoka text-2xl font-bold text-white mb-4 flex items-center space-x-2 flex-shrink-0">
+            <h3 class="font-fredoka text-xl md:text-2xl font-bold text-white mb-3 md:mb-4 flex items-center space-x-2 flex-shrink-0 pr-8">
                 <i class="fa-solid fa-pen-to-square text-pink-400"></i>
                 <span>Editor Kuis & Soal</span>
             </h3>
 
-            <div class="space-y-4 overflow-y-auto pr-2 flex-1 relative">
+            <div class="space-y-4 overflow-y-auto pr-1 flex-1 relative w-full">
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div class="sm:col-span-2">
                         <label class="block text-xs font-bold text-purple-300 uppercase mb-1">Judul Kuis</label>
-                        <input type="text" id="edit-quiz-title" placeholder="Nama Kuis..." class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
+                        <input type="text" id="edit-quiz-title" placeholder="Nama Kuis..." class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-xs md:text-sm focus:outline-none focus:border-pink-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-purple-300 uppercase mb-1">PIN Kuis</label>
-                        <input type="text" id="edit-quiz-pin" placeholder="1234" class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
+                        <input type="text" id="edit-quiz-pin" placeholder="1234" class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-xs md:text-sm focus:outline-none focus:border-pink-500">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-purple-300 uppercase mb-1">Deskripsi Ringkas</label>
-                    <input type="text" id="edit-quiz-desc" placeholder="Deskripsi singkat kuis..." class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-sm focus:outline-none focus:border-pink-500">
+                    <input type="text" id="edit-quiz-desc" placeholder="Deskripsi singkat kuis..." class="w-full px-3.5 py-2.5 rounded-xl bg-purple-950 border border-purple-700 text-white text-xs md:text-sm focus:outline-none focus:border-pink-500">
                 </div>
 
                 <!-- SECTION PERTANYAAN -->
-                <div class="border-t border-purple-800/80 pt-2">
+                <div class="border-t border-purple-800/80 pt-2 w-full">
                     <!-- STICKY HEADER UNTUK DAFTAR PERTANYAAN & TOMBOL TAMBAH SOAL -->
-                    <div class="sticky top-0 z-10 bg-quiz-darkPurple py-2.5 border-b border-purple-800/80 flex justify-between items-center mb-3 shadow-md">
-                        <h4 class="font-fredoka text-lg font-bold text-pink-300 flex items-center space-x-2">
+                    <div class="sticky top-0 z-10 bg-quiz-darkPurple py-2.5 border-b border-purple-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 shadow-md">
+                        <h4 class="font-fredoka text-base md:text-lg font-bold text-pink-300 flex items-center space-x-2">
                             <i class="fa-solid fa-list-ol text-sm"></i>
                             <span>Daftar Pertanyaan</span>
                         </h4>
                         <!-- Tombol Tambah Soal Paling Atas (Sticky Melayang Saat Scroll) -->
-                        <button onclick="app.addNewQuestionToEditingQuiz()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-xs font-bold text-white transition flex items-center space-x-1.5 shadow-lg transform active:scale-95">
+                        <button onclick="app.addNewQuestionToEditingQuiz()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-xs font-bold text-white transition flex items-center justify-center space-x-1.5 shadow-lg transform active:scale-95 self-start sm:self-auto">
                             <i class="fa-solid fa-plus text-sm"></i>
                             <span>Tambah Soal</span>
                         </button>
                     </div>
 
-                    <div id="modal-questions-editor-list" class="space-y-4">
+                    <div id="modal-questions-editor-list" class="space-y-4 w-full">
                         <!-- Dynamic Question Inputs JS -->
                     </div>
 
                     <!-- TOMBOL TAMBAH SOAL TAMBAHAN DI BAGIAN BAWAH DAFTAR SOAL -->
                     <div class="mt-4 pt-2">
-                        <button onclick="app.addNewQuestionToEditingQuiz()" class="w-full py-3 rounded-2xl bg-purple-900/60 hover:bg-purple-800 border-2 border-dashed border-purple-600 hover:border-pink-400 text-purple-200 hover:text-white font-bold text-sm transition flex items-center justify-center space-x-2">
+                        <button onclick="app.addNewQuestionToEditingQuiz()" class="w-full py-3 rounded-2xl bg-purple-900/60 hover:bg-purple-800 border-2 border-dashed border-purple-600 hover:border-pink-400 text-purple-200 hover:text-white font-bold text-xs md:text-sm transition flex items-center justify-center space-x-2">
                             <i class="fa-solid fa-plus-circle text-base text-pink-400"></i>
                             <span>+ Tambah Pertanyaan Baru</span>
                         </button>
@@ -694,11 +703,11 @@
                 </div>
             </div>
 
-            <div class="pt-4 mt-2 border-t border-purple-800/80 flex gap-3 flex-shrink-0">
-                <button onclick="app.saveEditingQuiz()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white shadow-lg transition">
+            <div class="pt-4 mt-2 border-t border-purple-800/80 flex flex-col sm:flex-row gap-3 flex-shrink-0 w-full">
+                <button onclick="app.saveEditingQuiz()" class="w-full sm:flex-1 py-3 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white text-sm shadow-lg transition">
                     Simpan & Sync Kuis
                 </button>
-                <button onclick="app.closeEditQuizModal()" class="px-5 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-sm transition">
+                <button onclick="app.closeEditQuizModal()" class="w-full sm:w-auto px-5 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 font-semibold text-xs md:text-sm transition">
                     Batal
                 </button>
             </div>
@@ -706,7 +715,7 @@
     </div>
 
     <!-- MODAL: ANTI-CHEAT WARNING -->
-    <div id="modal-anti-cheat-warning" class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto hidden anti-cheat-flash">
+    <div id="modal-anti-cheat-warning" class="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-4 overflow-y-auto hidden anti-cheat-flash">
         <div class="bg-red-950 border-2 border-red-500 w-full max-w-lg rounded-3xl p-5 md:p-8 shadow-2xl text-center space-y-4 md:space-y-6 my-auto max-h-[90vh] overflow-y-auto">
             <div class="w-16 h-16 md:w-20 md:h-20 bg-red-600 text-white rounded-full flex items-center justify-center mx-auto text-3xl md:text-4xl shadow-xl animate-bounce">
                 <i class="fa-solid fa-triangle-exclamation"></i>
@@ -731,25 +740,25 @@
     </div>
 
     <!-- MODAL: KICKED POP-UP -->
-    <div id="modal-anti-cheat-kicked" class="fixed inset-0 bg-black/90 backdrop-blur-lg z-50 flex items-center justify-center p-4 overflow-y-auto hidden">
-        <div class="bg-quiz-darkPurple border-2 border-red-600 w-full max-w-md rounded-3xl p-6 shadow-2xl text-center space-y-5 my-auto max-h-[90vh] overflow-y-auto">
-            <div class="w-16 h-16 bg-red-600/30 border border-red-500 text-red-400 rounded-2xl flex items-center justify-center mx-auto text-3xl">
+    <div id="modal-anti-cheat-kicked" class="fixed inset-0 bg-black/90 backdrop-blur-lg z-50 flex items-center justify-center p-3 md:p-4 overflow-y-auto hidden">
+        <div class="bg-quiz-darkPurple border-2 border-red-600 w-full max-w-md rounded-3xl p-5 md:p-6 shadow-2xl text-center space-y-5 my-auto max-h-[90vh] overflow-y-auto">
+            <div class="w-14 h-14 md:w-16 md:h-16 bg-red-600/30 border border-red-500 text-red-400 rounded-2xl flex items-center justify-center mx-auto text-2xl md:text-3xl">
                 <i class="fa-solid fa-ban"></i>
             </div>
-            <h3 class="font-fredoka text-2xl font-bold text-white">Kuis Dibatalkan</h3>
-            <p id="kicked-message-text" class="text-purple-200 text-sm leading-relaxed bg-purple-950 p-4 rounded-2xl border border-purple-800">
+            <h3 class="font-fredoka text-xl md:text-2xl font-bold text-white">Kuis Dibatalkan</h3>
+            <p id="kicked-message-text" class="text-purple-200 text-xs md:text-sm leading-relaxed bg-purple-950 p-4 rounded-2xl border border-purple-800">
                 Anda telah keluar dari Kuis, silakan mulai ulang dari awal.
             </p>
-            <button onclick="app.closeKickedModal()" class="w-full py-3 rounded-xl bg-purple-700 hover:bg-purple-600 font-bold text-white transition">
+            <button onclick="app.closeKickedModal()" class="w-full py-3 rounded-xl bg-purple-700 hover:bg-purple-600 font-bold text-white text-sm transition">
                 Mengerti & Kembali
             </button>
         </div>
     </div>
 
     <!-- TOAST NOTIFICATION POPUP -->
-    <div id="toast-notification" class="fixed bottom-6 right-6 z-50 flex items-center space-x-3 bg-purple-900 border border-pink-500/50 text-white px-5 py-3.5 rounded-2xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-        <i id="toast-icon" class="fa-solid fa-circle-check text-pink-400 text-xl"></i>
-        <span id="toast-message" class="text-sm font-semibold">Notifikasi</span>
+    <div id="toast-notification" class="fixed bottom-4 right-4 left-4 sm:left-auto z-50 flex items-center space-x-3 bg-purple-900 border border-pink-500/50 text-white px-4 md:px-5 py-3.5 rounded-2xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none max-w-md sm:max-w-sm">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-pink-400 text-lg md:text-xl flex-shrink-0"></i>
+        <span id="toast-message" class="text-xs md:text-sm font-semibold truncate">Notifikasi</span>
     </div>
 
     <!-- REAL-TIME NETWORK & MULTI-DEVICE SYNC ENGINE -->
@@ -980,7 +989,7 @@
                     if (badgeIcon) badgeIcon.className = 'fa-solid fa-wifi text-green-400';
                 } else {
                     if (badgeText) {
-                        badgeText.innerText = isOnlineNative ? 'Internet OK (Relay Standby)' : 'Offline';
+                        badgeText.innerText = isOnlineNative ? 'Online' : 'Offline';
                         badgeText.className = isOnlineNative ? 'text-cyan-300 font-semibold' : 'text-purple-300 font-semibold';
                     }
                     if (badgeIcon) badgeIcon.className = isOnlineNative ? 'fa-solid fa-globe text-cyan-400' : 'fa-solid fa-cloud-slash text-purple-400';
@@ -1389,8 +1398,10 @@
                 const statsHeader = document.getElementById('game-stats-header');
                 if (viewId === 'play') {
                     statsHeader.classList.remove('hidden');
+                    statsHeader.classList.add('flex');
                 } else {
                     statsHeader.classList.add('hidden');
+                    statsHeader.classList.remove('flex');
                 }
 
                 if (viewId === 'home') this.renderHomeQuizzes();
@@ -1419,7 +1430,7 @@
             showToast(msg, icon = 'fa-circle-check') {
                 const toast = document.getElementById('toast-notification');
                 document.getElementById('toast-message').innerText = msg;
-                document.getElementById('toast-icon').className = `fa-solid ${icon}`;
+                document.getElementById('toast-icon').className = `fa-solid ${icon} text-lg md:text-xl flex-shrink-0`;
                 
                 toast.classList.remove('translate-y-20', 'opacity-0');
                 setTimeout(() => {
@@ -1436,14 +1447,14 @@
                     container.innerHTML = `
                         <div class="col-span-full text-center py-12 bg-purple-950/40 rounded-3xl border border-purple-800">
                             <i class="fa-solid fa-folder-open text-4xl text-purple-400 mb-2"></i>
-                            <p class="text-purple-300">Belum ada kuis tersedia. Buat kuis di Admin panel!</p>
+                            <p class="text-purple-300 text-sm">Belum ada kuis tersedia. Buat kuis di Admin panel!</p>
                         </div>
                     `;
                     return;
                 }
 
                 container.innerHTML = this.quizzes.map((q) => `
-                    <div class="quiz-card-hover border border-purple-800/80 rounded-3xl p-6 flex flex-col justify-between shadow-xl relative overflow-hidden" style="background-color: ${this.settings.cardBg || '#1e1338'}">
+                    <div class="quiz-card-hover border border-purple-800/80 rounded-3xl p-5 md:p-6 flex flex-col justify-between shadow-xl relative overflow-hidden w-full" style="background-color: ${this.settings.cardBg || '#1e1338'}">
                         <div>
                             <div class="flex justify-between items-start mb-3">
                                 <span class="bg-purple-900/80 border border-purple-700 text-purple-300 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full">
@@ -1453,8 +1464,8 @@
                                     <i class="fa-solid fa-list-check mr-1"></i>${q.questions.length} Soal
                                 </span>
                             </div>
-                            <h3 class="font-fredoka text-xl font-bold text-white mb-2 leading-snug">${q.title}</h3>
-                            <p class="text-purple-300/80 text-xs line-clamp-2 mb-4">${q.description || 'Kuis interaktif'}</p>
+                            <h3 class="font-fredoka text-lg md:text-xl font-bold text-white mb-2 leading-snug break-words">${q.title}</h3>
+                            <p class="text-purple-300/80 text-xs line-clamp-2 mb-4 break-words">${q.description || 'Kuis interaktif'}</p>
                         </div>
 
                         <button onclick="app.startQuiz('${q.id}')" class="w-full py-3 rounded-2xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 font-bold text-white text-sm shadow-lg transition flex items-center justify-center space-x-2">
@@ -1519,10 +1530,10 @@
 
                 if (qType === 'essay') {
                     container.innerHTML = `
-                        <div class="col-span-full space-y-3">
+                        <div class="col-span-full space-y-3 w-full">
                             <textarea id="essay-answer-input" rows="3" placeholder="Ketik jawaban esai kamu di sini..." 
-                                class="w-full p-4 rounded-2xl bg-purple-950/90 border-2 border-purple-600 text-white placeholder-purple-400 font-semibold text-base focus:outline-none focus:border-pink-500 shadow-inner resize-none"></textarea>
-                            <button onclick="app.submitEssayAnswer()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white text-lg shadow-xl transition active:scale-95 flex items-center justify-center space-x-2">
+                                class="w-full p-4 rounded-2xl bg-purple-950/90 border-2 border-purple-600 text-white placeholder-purple-400 font-semibold text-sm md:text-base focus:outline-none focus:border-pink-500 shadow-inner resize-none"></textarea>
+                            <button onclick="app.submitEssayAnswer()" class="w-full py-3.5 md:py-4 rounded-2xl bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 font-bold text-white text-base shadow-xl transition active:scale-95 flex items-center justify-center space-x-2">
                                 <i class="fa-solid fa-paper-plane"></i>
                                 <span>Kirim Jawaban Esai</span>
                             </button>
@@ -1539,9 +1550,9 @@
                     container.innerHTML = (q.options || []).map((opt, i) => {
                         const c = colors[i % colors.length];
                         return `
-                            <button onclick="app.submitAnswer(${i})" class="btn-option ${c.bg} ${c.border} border-2 p-5 rounded-2xl text-left font-bold text-white text-base md:text-lg flex items-center space-x-4 shadow-lg w-full transition">
-                                <i class="fa-solid ${c.icon} text-lg opacity-80"></i>
-                                <span class="flex-1">${opt}</span>
+                            <button onclick="app.submitAnswer(${i})" class="btn-option ${c.bg} ${c.border} border-2 p-4 md:p-5 rounded-2xl text-left font-bold text-white text-sm md:text-base flex items-center space-x-3 md:space-x-4 shadow-lg w-full transition break-words">
+                                <i class="fa-solid ${c.icon} text-base md:text-lg opacity-80 flex-shrink-0"></i>
+                                <span class="flex-1 break-words">${opt}</span>
                             </button>
                         `;
                     }).join('');
@@ -1641,12 +1652,12 @@
                     const questionPoints = 1000 + speedBonus + (this.streak > 1 ? 200 : 0);
                     this.score += questionPoints;
 
-                    feedbackBanner.className = "p-4 rounded-2xl text-center font-bold text-xl transition-all duration-300 bg-green-600/90 text-white border border-green-400 shadow-xl";
+                    feedbackBanner.className = "p-3.5 md:p-4 rounded-2xl text-center font-bold text-base md:text-xl transition-all duration-300 bg-green-600/90 text-white border border-green-400 shadow-xl w-full";
                     feedbackMessage.innerText = `✨ Benar! +${questionPoints} Poin ${this.streak > 1 ? '🔥 Streak ' + this.streak : ''}`;
                 } else {
                     soundFX.playWrong();
                     this.streak = 0;
-                    feedbackBanner.className = "p-4 rounded-2xl text-center font-bold text-xl transition-all duration-300 bg-red-600/90 text-white border border-red-400 shadow-xl";
+                    feedbackBanner.className = "p-3.5 md:p-4 rounded-2xl text-center font-bold text-base md:text-xl transition-all duration-300 bg-red-600/90 text-white border border-red-400 shadow-xl w-full";
                     
                     if (answerMeta === 'timeout') {
                         feedbackMessage.innerText = '⏰ Waktu Habis!';
@@ -1705,16 +1716,16 @@
                 const badgeTextEl = document.getElementById('result-grade-badge-text');
                 if (gradeVal === 100) {
                     badgeTextEl.innerText = "🏆 Sempurna! Semua jawaban benar (100%)";
-                    badgeTextEl.className = "mt-3 inline-block px-4 py-1.5 rounded-xl bg-green-800/80 border border-green-500 text-xs font-bold text-green-200";
+                    badgeTextEl.className = "mt-3 inline-block px-3 md:px-4 py-1.5 rounded-xl bg-green-800/80 border border-green-500 text-[11px] md:text-xs font-bold text-green-200";
                 } else if (gradeVal >= 75) {
                     badgeTextEl.innerText = "🌟 Sangat Bagus! Hasil memuaskan";
-                    badgeTextEl.className = "mt-3 inline-block px-4 py-1.5 rounded-xl bg-blue-800/80 border border-blue-500 text-xs font-bold text-blue-200";
+                    badgeTextEl.className = "mt-3 inline-block px-3 md:px-4 py-1.5 rounded-xl bg-blue-800/80 border border-blue-500 text-[11px] md:text-xs font-bold text-blue-200";
                 } else if (gradeVal >= 50) {
                     badgeTextEl.innerText = "👍 Cukup Baik! Tingkatkan lagi belajarmu";
-                    badgeTextEl.className = "mt-3 inline-block px-4 py-1.5 rounded-xl bg-amber-800/80 border border-amber-500 text-xs font-bold text-amber-200";
+                    badgeTextEl.className = "mt-3 inline-block px-3 md:px-4 py-1.5 rounded-xl bg-amber-800/80 border border-amber-500 text-[11px] md:text-xs font-bold text-amber-200";
                 } else {
                     badgeTextEl.innerText = "💪 Jangan Menyerah! Coba lagi untuk nilai lebih tinggi";
-                    badgeTextEl.className = "mt-3 inline-block px-4 py-1.5 rounded-xl bg-red-800/80 border border-red-500 text-xs font-bold text-red-200";
+                    badgeTextEl.className = "mt-3 inline-block px-3 md:px-4 py-1.5 rounded-xl bg-red-800/80 border border-red-500 text-[11px] md:text-xs font-bold text-red-200";
                 }
 
                 this.navTo('results');
@@ -1756,26 +1767,26 @@
             renderLeaderboard() {
                 const container = document.getElementById('leaderboard-list');
                 if (this.leaderboard.length === 0) {
-                    container.innerHTML = '<p class="text-center text-purple-300/70 py-6">Belum ada data papan skor.</p>';
+                    container.innerHTML = '<p class="text-center text-purple-300/70 py-6 text-xs md:text-sm">Belum ada data papan skor.</p>';
                     return;
                 }
 
                 container.innerHTML = this.leaderboard.slice(0, 10).map((item, index) => {
-                    let medal = `<span class="font-bold text-purple-300 text-sm w-6">#${index + 1}</span>`;
-                    if (index === 0) medal = '<span class="text-xl">🥇</span>';
-                    if (index === 1) medal = '<span class="text-xl">🥈</span>';
-                    if (index === 2) medal = '<span class="text-xl">🥉</span>';
+                    let medal = `<span class="font-bold text-purple-300 text-xs md:text-sm w-6">#${index + 1}</span>`;
+                    if (index === 0) medal = '<span class="text-lg md:text-xl">🥇</span>';
+                    if (index === 1) medal = '<span class="text-lg md:text-xl">🥈</span>';
+                    if (index === 2) medal = '<span class="text-lg md:text-xl">🥉</span>';
 
                     return `
-                        <div class="flex items-center justify-between p-3.5 bg-purple-950/60 rounded-xl border border-purple-800/60">
-                            <div class="flex items-center space-x-3">
+                        <div class="flex items-center justify-between p-3.5 bg-purple-950/60 rounded-xl border border-purple-800/60 w-full">
+                            <div class="flex items-center space-x-3 truncate">
                                 ${medal}
-                                <div>
-                                    <span class="font-bold text-white text-sm block">${item.name}</span>
-                                    <span class="text-[10px] text-purple-400">${item.quizTitle} • ${item.date}</span>
+                                <div class="truncate">
+                                    <span class="font-bold text-white text-xs md:text-sm block truncate">${item.name}</span>
+                                    <span class="text-[10px] md:text-xs text-purple-400 truncate block">${item.quizTitle} • ${item.date}</span>
                                 </div>
                             </div>
-                            <span class="font-fredoka text-amber-400 font-bold text-lg">${item.score} pts</span>
+                            <span class="font-fredoka text-amber-400 font-bold text-base md:text-lg flex-shrink-0 ml-2">${item.score} pts</span>
                         </div>
                     `;
                 }).join('');
@@ -1832,13 +1843,13 @@
                 const contentAppearance = document.getElementById('admin-content-appearance');
 
                 if (tab === 'quizzes') {
-                    quizzesTab.className = "px-5 py-3 font-fredoka text-lg font-bold border-b-2 border-pink-500 text-pink-400";
-                    appearanceTab.className = "px-5 py-3 font-fredoka text-lg font-bold text-purple-400 hover:text-purple-200";
+                    quizzesTab.className = "px-4 md:px-5 py-3 font-fredoka text-base md:text-lg font-bold border-b-2 border-pink-500 text-pink-400 whitespace-nowrap";
+                    appearanceTab.className = "px-4 md:px-5 py-3 font-fredoka text-base md:text-lg font-bold text-purple-400 hover:text-purple-200 whitespace-nowrap";
                     contentQuizzes.classList.remove('hidden');
                     contentAppearance.classList.add('hidden');
                 } else {
-                    appearanceTab.className = "px-5 py-3 font-fredoka text-lg font-bold border-b-2 border-pink-500 text-pink-400";
-                    quizzesTab.className = "px-5 py-3 font-fredoka text-lg font-bold text-purple-400 hover:text-purple-200";
+                    appearanceTab.className = "px-4 md:px-5 py-3 font-fredoka text-base md:text-lg font-bold border-b-2 border-pink-500 text-pink-400 whitespace-nowrap";
+                    quizzesTab.className = "px-4 md:px-5 py-3 font-fredoka text-base md:text-lg font-bold text-purple-400 hover:text-purple-200 whitespace-nowrap";
                     contentAppearance.classList.remove('hidden');
                     contentQuizzes.classList.add('hidden');
                 }
@@ -1847,16 +1858,16 @@
             renderAdminDashboard() {
                 const container = document.getElementById('admin-quizzes-list');
                 container.innerHTML = this.quizzes.map((q) => `
-                    <div class="card-element border border-purple-800 p-5 rounded-2xl flex flex-wrap justify-between items-center gap-4" style="background-color: ${this.settings.cardBg || '#1e1338'}">
-                        <div>
-                            <div class="flex items-center space-x-2">
-                                <h4 class="font-fredoka text-lg font-bold text-white">${q.title}</h4>
+                    <div class="card-element border border-purple-800 p-4 md:p-5 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full" style="background-color: ${this.settings.cardBg || '#1e1338'}">
+                        <div class="w-full sm:w-auto truncate">
+                            <div class="flex items-center space-x-2 flex-wrap">
+                                <h4 class="font-fredoka text-base md:text-lg font-bold text-white truncate">${q.title}</h4>
                                 <span class="bg-purple-900 border border-purple-700 text-amber-400 text-xs px-2 py-0.5 rounded font-bold">PIN: ${q.pin}</span>
                             </div>
                             <p class="text-xs text-purple-300 mt-1">${q.questions.length} Pertanyaan • ${q.description || 'Tanpa deskripsi'}</p>
                         </div>
 
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
                             <button onclick="app.openEditQuizModal('${q.id}')" class="px-3.5 py-2 bg-purple-800 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition flex items-center space-x-1">
                                 <i class="fa-solid fa-pen-to-square"></i>
                                 <span>Edit Soal</span>
@@ -1900,124 +1911,135 @@
                 const q = this.editingQuizTemp;
                 document.getElementById('edit-quiz-title').value = q.title;
                 document.getElementById('edit-quiz-pin').value = q.pin;
-                document.getElementById('edit-quiz-desc').value = q.description;
+                document.getElementById('edit-quiz-desc').value = q.description || '';
 
-                const questionsContainer = document.getElementById('modal-questions-editor-list');
-                questionsContainer.innerHTML = q.questions.map((quest, qIdx) => {
-                    const qType = quest.type || 'multiple_choice';
-                    return `
-                        <div class="bg-purple-950/70 p-5 rounded-2xl border border-purple-800 space-y-3 relative">
-                            <div class="flex justify-between items-center flex-wrap gap-2">
-                                <div class="flex items-center space-x-2">
-                                    <span class="font-bold text-sm text-pink-400">Pertanyaan #${qIdx + 1}</span>
-                                    <select onchange="app.updateTempQuestionType(${qIdx}, this.value)" class="px-2.5 py-1 rounded-lg bg-purple-900 border border-purple-700 text-amber-300 font-bold text-xs focus:outline-none">
-                                        <option value="multiple_choice" ${qType === 'multiple_choice' ? 'selected' : ''}>Pilihan Ganda (PG)</option>
-                                        <option value="essay" ${qType === 'essay' ? 'selected' : ''}>Esai</option>
-                                    </select>
-                                </div>
-                                <div class="flex items-center space-x-3">
-                                    <div class="flex items-center space-x-1">
-                                        <span class="text-xs text-purple-300">Waktu (s):</span>
-                                        <input type="number" value="${quest.timeLimit || 15}" min="5" max="120" onchange="app.updateTempTimeLimit(${qIdx}, this.value)" class="w-16 px-2 py-1 rounded bg-purple-900 border border-purple-700 text-white text-xs">
-                                    </div>
-                                    <button onclick="app.removeQuestionFromEditingQuiz(${qIdx})" class="text-xs text-red-400 hover:text-red-300">
-                                        <i class="fa-solid fa-trash mr-1"></i>Hapus Soal
-                                    </button>
-                                </div>
+                const container = document.getElementById('modal-questions-editor-list');
+                container.innerHTML = q.questions.map((question, qIdx) => `
+                    <div class="bg-purple-950/80 p-4 rounded-2xl border border-purple-800 space-y-3 relative w-full">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-pink-400">Pertanyaan #${qIdx + 1}</span>
+                            <div class="flex items-center space-x-2">
+                                <select onchange="app.updateQuestionType(${qIdx}, this.value)" class="bg-purple-900 text-xs text-white border border-purple-700 rounded-lg px-2 py-1 focus:outline-none">
+                                    <option value="multiple_choice" ${question.type !== 'essay' ? 'selected' : ''}>Pilihan Ganda</option>
+                                    <option value="essay" ${question.type === 'essay' ? 'selected' : ''}>Esai</option>
+                                </select>
+                                <button onclick="app.removeQuestionFromEditing(${qIdx})" class="text-red-400 hover:text-red-300 p-1">
+                                    <i class="fa-solid fa-trash text-sm"></i>
+                                </button>
                             </div>
-
-                            <div>
-                                <input type="text" value="${quest.question}" onchange="app.updateTempQuestionText(${qIdx}, this.value)" placeholder="Teks Pertanyaan"
-                                    class="w-full px-3 py-2 rounded-xl bg-purple-900 border border-purple-700 text-white text-sm focus:outline-none">
-                            </div>
-
-                            ${qType === 'essay' ? `
-                                <div>
-                                    <label class="block text-[11px] font-bold text-purple-300 uppercase mb-1">Kunci / Jawaban Acuan Esai (Opsional)</label>
-                                    <input type="text" value="${quest.sampleAnswer || ''}" onchange="app.updateTempSampleAnswer(${qIdx}, this.value)" placeholder="Contoh: Proses pembuatan makanan tumbuhan"
-                                        class="w-full px-3 py-2 rounded-xl bg-purple-900/80 border border-purple-700 text-yellow-200 text-xs focus:outline-none">
-                                </div>
-                            ` : `
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 pt-1">
-                                    ${(quest.options || ['A', 'B', 'C', 'D']).map((opt, oIdx) => `
-                                        <div class="flex items-center space-x-2 bg-purple-900/40 p-1.5 rounded-xl border border-purple-800">
-                                            <input type="radio" name="correct_${qIdx}" ${quest.correctIndex === oIdx ? 'checked' : ''} onchange="app.setTempCorrectAnswer(${qIdx}, ${oIdx})" class="accent-green-500 cursor-pointer">
-                                            <input type="text" value="${opt}" onchange="app.updateTempOptionText(${qIdx}, ${oIdx}, this.value)" class="flex-1 px-2 py-1 bg-transparent text-white text-xs focus:outline-none">
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            `}
                         </div>
-                    `;
-                }).join('');
+
+                        <div>
+                            <input type="text" value="${question.question.replace(/"/g, '&quot;')}" oninput="app.updateQuestionText(${qIdx}, this.value)" placeholder="Tulis teks pertanyaan..." 
+                                class="w-full px-3 py-2 rounded-xl bg-purple-900 border border-purple-700 text-white text-xs md:text-sm focus:outline-none focus:border-pink-500">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-purple-300 block mb-1">Batas Waktu (Detik)</label>
+                                <input type="number" value="${question.timeLimit || 15}" min="5" max="120" onchange="app.updateQuestionTime(${qIdx}, this.value)" 
+                                    class="w-full px-3 py-1.5 rounded-lg bg-purple-900 border border-purple-700 text-white text-xs focus:outline-none">
+                            </div>
+                        </div>
+
+                        ${question.type === 'essay' ? `
+                            <div>
+                                <label class="text-[10px] text-purple-300 block mb-1">Contoh/Kata Kunci Jawaban Esai</label>
+                                <input type="text" value="${(question.sampleAnswer || '').replace(/"/g, '&quot;')}" oninput="app.updateEssayKey(${qIdx}, this.value)" placeholder="Contoh kata kunci..." 
+                                    class="w-full px-3 py-2 rounded-xl bg-purple-900 border border-purple-700 text-white text-xs focus:outline-none">
+                            </div>
+                        ` : `
+                            <div class="space-y-2">
+                                <label class="text-[10px] text-purple-300 block">Pilihan Jawaban (Klik radio untuk pilih kunci benar)</label>
+                                ${(question.options || []).map((opt, oIdx) => `
+                                    <div class="flex items-center space-x-2">
+                                        <input type="radio" name="correct_${qIdx}" ${question.correctIndex === oIdx ? 'checked' : ''} onchange="app.updateCorrectOption(${qIdx}, ${oIdx})" class="accent-pink-500 cursor-pointer">
+                                        <input type="text" value="${opt.replace(/"/g, '&quot;')}" oninput="app.updateOptionText(${qIdx}, ${oIdx}, this.value)" placeholder="Opsi ${oIdx + 1}" 
+                                            class="w-full px-3 py-1.5 rounded-lg bg-purple-900 border border-purple-700 text-white text-xs focus:outline-none">
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `}
+                    </div>
+                `).join('');
 
                 document.getElementById('modal-edit-quiz').classList.remove('hidden');
             },
 
-            updateTempQuestionType(qIdx, type) {
-                this.editingQuizTemp.questions[qIdx].type = type;
-                if (type === 'multiple_choice' && !this.editingQuizTemp.questions[qIdx].options) {
-                    this.editingQuizTemp.questions[qIdx].options = ['Opsi A', 'Opsi B', 'Opsi C', 'Opsi D'];
-                    this.editingQuizTemp.questions[qIdx].correctIndex = 0;
-                }
-                this.renderQuizEditorModal();
-            },
-
-            updateTempSampleAnswer(qIdx, val) {
-                this.editingQuizTemp.questions[qIdx].sampleAnswer = val;
-            },
-
-            updateTempQuestionText(qIdx, val) {
-                this.editingQuizTemp.questions[qIdx].question = val;
-            },
-
-            updateTempTimeLimit(qIdx, val) {
-                this.editingQuizTemp.questions[qIdx].timeLimit = parseInt(val) || 15;
-            },
-
-            updateTempOptionText(qIdx, oIdx, val) {
-                if (!this.editingQuizTemp.questions[qIdx].options) {
-                    this.editingQuizTemp.questions[qIdx].options = ['Opsi A', 'Opsi B', 'Opsi C', 'Opsi D'];
-                }
-                this.editingQuizTemp.questions[qIdx].options[oIdx] = val;
-            },
-
-            setTempCorrectAnswer(qIdx, oIdx) {
-                this.editingQuizTemp.questions[qIdx].correctIndex = oIdx;
+            closeEditQuizModal() {
+                document.getElementById('modal-edit-quiz').classList.add('hidden');
+                this.editingQuizTemp = null;
             },
 
             addNewQuestionToEditingQuiz() {
+                if (!this.editingQuizTemp) return;
                 this.editingQuizTemp.questions.push({
                     type: 'multiple_choice',
-                    question: 'Pertanyaan Baru',
+                    question: 'Pertanyaan baru...',
                     options: ['Pilihan A', 'Pilihan B', 'Pilihan C', 'Pilihan D'],
                     correctIndex: 0,
                     timeLimit: 15
                 });
                 this.renderQuizEditorModal();
-
-                // Auto-scroll ke soal baru yang paling bawah
-                setTimeout(() => {
-                    const listContainer = document.getElementById('modal-questions-editor-list');
-                    if (listContainer && listContainer.lastElementChild) {
-                        listContainer.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }
-                }, 100);
             },
 
-            removeQuestionFromEditingQuiz(qIdx) {
+            removeQuestionFromEditing(qIdx) {
+                if (!this.editingQuizTemp) return;
                 if (this.editingQuizTemp.questions.length <= 1) {
-                    this.showToast('Minimal harus ada 1 pertanyaan!', 'fa-triangle-exclamation');
+                    this.showToast('Kuis minimal harus memiliki 1 soal!', 'fa-triangle-exclamation');
                     return;
                 }
                 this.editingQuizTemp.questions.splice(qIdx, 1);
                 this.renderQuizEditorModal();
             },
 
+            updateQuestionType(qIdx, type) {
+                if (!this.editingQuizTemp) return;
+                const q = this.editingQuizTemp.questions[qIdx];
+                q.type = type;
+                if (type === 'essay' && !q.sampleAnswer) {
+                    q.sampleAnswer = 'Jawaban benar';
+                } else if (type === 'multiple_choice' && !q.options) {
+                    q.options = ['Opsi A', 'Opsi B', 'Opsi C', 'Opsi D'];
+                    q.correctIndex = 0;
+                }
+                this.renderQuizEditorModal();
+            },
+
+            updateQuestionText(qIdx, val) {
+                if (this.editingQuizTemp) this.editingQuizTemp.questions[qIdx].question = val;
+            },
+
+            updateQuestionTime(qIdx, val) {
+                if (this.editingQuizTemp) this.editingQuizTemp.questions[qIdx].timeLimit = parseInt(val) || 15;
+            },
+
+            updateEssayKey(qIdx, val) {
+                if (this.editingQuizTemp) this.editingQuizTemp.questions[qIdx].sampleAnswer = val;
+            },
+
+            updateOptionText(qIdx, oIdx, val) {
+                if (this.editingQuizTemp) this.editingQuizTemp.questions[qIdx].options[oIdx] = val;
+            },
+
+            updateCorrectOption(qIdx, oIdx) {
+                if (this.editingQuizTemp) this.editingQuizTemp.questions[qIdx].correctIndex = oIdx;
+            },
+
             saveEditingQuiz() {
-                this.editingQuizTemp.title = document.getElementById('edit-quiz-title').value.trim() || 'Tanpa Judul';
-                this.editingQuizTemp.pin = document.getElementById('edit-quiz-pin').value.trim() || '1234';
-                this.editingQuizTemp.description = document.getElementById('edit-quiz-desc').value.trim();
+                if (!this.editingQuizTemp) return;
+                const title = document.getElementById('edit-quiz-title').value.trim();
+                const pin = document.getElementById('edit-quiz-pin').value.trim();
+                const desc = document.getElementById('edit-quiz-desc').value.trim();
+
+                if (!title || !pin) {
+                    this.showToast('Judul dan PIN kuis wajib diisi!', 'fa-triangle-exclamation');
+                    return;
+                }
+
+                this.editingQuizTemp.title = title;
+                this.editingQuizTemp.pin = pin;
+                this.editingQuizTemp.description = desc;
 
                 const existingIdx = this.quizzes.findIndex(q => q.id === this.editingQuizTemp.id);
                 if (existingIdx >= 0) {
@@ -2029,26 +2051,24 @@
                 this.saveStorage();
                 this.closeEditQuizModal();
                 this.renderAdminDashboard();
-                this.showToast('Kuis disimpan & disinkronkan ke perangkat lain!');
-            },
-
-            closeEditQuizModal() {
-                document.getElementById('modal-edit-quiz').classList.add('hidden');
+                this.renderHomeQuizzes();
+                this.showToast('Kuis berhasil disimpan dan disinkronkan!');
             },
 
             deleteQuiz(quizId) {
-                if (confirm('Yakin ingin menghapus kuis ini?')) {
+                if (confirm('Apakah Anda yakin ingin menghapus kuis ini?')) {
                     this.quizzes = this.quizzes.filter(q => q.id !== quizId);
                     this.saveStorage();
                     this.renderAdminDashboard();
-                    this.showToast('Kuis dihapus.');
+                    this.renderHomeQuizzes();
+                    this.showToast('Kuis telah dihapus.');
                 }
             },
 
             saveAppearanceSettings(e) {
                 e.preventDefault();
-                this.settings.title = document.getElementById('setting-app-title').value;
-                this.settings.welcomeMsg = document.getElementById('setting-welcome-msg').value;
+                this.settings.title = document.getElementById('setting-app-title').value.trim() || 'Auraphone Quiz';
+                this.settings.welcomeMsg = document.getElementById('setting-welcome-msg').value.trim() || 'Asah Pengetahuanmu Sekarang!';
                 this.settings.themeBg = document.getElementById('setting-theme-bg').value;
                 this.settings.cardBg = document.getElementById('setting-card-bg').value;
                 this.settings.soundEnabled = document.getElementById('setting-sound-enabled').checked;
@@ -2057,25 +2077,35 @@
 
                 this.saveStorage();
                 this.applySettings();
-                this.showToast('Tampilan & Pengaturan Web berhasil disimpan!');
+                this.showToast('Pengaturan tampilan berhasil disimpan!');
             },
 
             resetSystemData() {
-                if (confirm('Kembalikan semua kuis dan pengaturan ke data awal?')) {
+                if (confirm('Reset seluruh data kuis dan pengaturan ke bawaan awal?')) {
                     localStorage.removeItem('quizizz_quizzes');
                     localStorage.removeItem('quizizz_settings');
                     localStorage.removeItem('quizizz_leaderboard');
-                    this.loadFromStorage();
-                    this.applySettings();
-                    this.renderAdminDashboard();
+                    this.quizzes = DEFAULT_QUIZZES;
+                    this.settings = {
+                        title: 'Auraphone Quiz',
+                        welcomeMsg: 'Asah Pengetahuanmu Sekarang!',
+                        themeBg: '#0f0a1c',
+                        cardBg: '#1e1338',
+                        soundEnabled: true,
+                        useTimer: true,
+                        antiCheatTimer: 10
+                    };
                     this.saveStorage();
-                    this.showToast('Sistem direset ke kondisi awal.');
+                    this.applySettings();
+                    this.renderHomeQuizzes();
+                    this.renderAdminDashboard();
+                    this.showToast('Data berhasil di-reset ke bawaan.');
                 }
             }
         };
 
-        // Initialize application on window load
-        window.onload = () => {
+        // Window onload initialization
+        window.onload = function() {
             app.init();
         };
     </script>
